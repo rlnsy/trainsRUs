@@ -1,0 +1,14 @@
+version: '3'
+services:
+  database:
+    build: db
+    restart: always
+    ports:
+      - "5432:5432"
+  application:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - "database"
+    command: ["python", "app.py"]
