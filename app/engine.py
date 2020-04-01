@@ -36,7 +36,7 @@ class NotAllowed(Exception):
 
 
 def sample():
-  query = "SELECT * from trains"
+  query = "SELECT * from Train"
   rows = dbw.execute(query)
   return {
     'executed': query,
