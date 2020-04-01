@@ -93,12 +93,14 @@ logger = ApplicationLogger()
 Routes
 """
 
-@app.route('/', methods=["GET"])
+VERSION = "v1"
+
+@app.route(('/%s/' % VERSION), methods=["GET"])
 def hello():
     return obj_response(engine.sample())
     
 
-@app.route('/execute', methods=["POST"])
+@app.route(('/%s/execute' % VERSION), methods=["POST"])
 def execute():
     return obj_request(
       lambda r: 
