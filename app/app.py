@@ -87,14 +87,16 @@ logger = ApplicationLogger()
 Routes
 """
 
-@app.route('/')
+@app.route('/', methods=["GET"])
 def hello():
     return obj_response(engine.sample())
     
 
-@app.route('/execute')
+@app.route('/execute', methods=["POST"])
 def execute():
-    return obj_request(lambda r: obj_response(engine.handle_execute(r)))
+    return obj_request(
+      lambda r: 
+      obj_response(engine.handle_execute(r), status_code=SUCCESS_CREATE))
     
 
 """
