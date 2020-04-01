@@ -79,7 +79,7 @@ INSERT INTO Train_Has_Class VALUES (3,'First');
 INSERT INTO Train_Has_Class VALUES (3,'Business');
 INSERT INTO Train_Has_Class VALUES (3,'Standard');
 
-INSERT INTO	Worker VALUES	(1,'Sean','Dale','(124)-985-4832','Mechanical Engineer','M T W Th F');
+INSERT INTO Worker VALUES	(1,'Sean','Dale','(124)-985-4832','Mechanical Engineer','M T W Th F');
 INSERT INTO	Worker VALUES	(2,'Kaiya','Cantrell','(653)-452-4382','Office Administrator','M W F');
 INSERT INTO	Worker VALUES	(3,'Marc','Padilla','(623)-874-1983','CEO','Sa Su M T W F');
 INSERT INTO	Worker VALUES	(4,'Wilf','Fischer','(875)-983-4572','Conductor','Sa M F');
