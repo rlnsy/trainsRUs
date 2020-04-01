@@ -69,7 +69,8 @@ CREATE TABLE Worker (
   first_name char(50),
   last_name char(50),
   phone_number char(20),
-  availability char(10)
+  role_name char(50),
+  availability char(20)
 );
 
 CREATE TABLE Maintenance_Worker (
@@ -119,6 +120,31 @@ CREATE TABLE Works_Shift(
 );
 
 -- Tuples
+INSERT INTO
+  Address
+VALUES
+  ('321 41 St', 'Vancouver');
+
+INSERT INTO
+  Address
+VALUES
+  ('451 49 Ave', 'Delta');
+
+INSERT INTO
+  Address
+VALUES
+  ('3 Red St', 'Calgary');
+
+INSERT INTO
+  Address
+VALUES
+  ('3 3rd Ave', 'Toronto');
+
+INSERT INTO
+  Address
+VALUES
+  ('994 3rd St', 'Halifax');
+
 INSERT INTO
   Passenger
 VALUES
@@ -180,29 +206,59 @@ VALUES
   );
 
 INSERT INTO
-  Address
+  Class
 VALUES
-  ('321 41St', 'Vancouver');
+  ('First', true, true, true);
 
 INSERT INTO
-  Address
+  Class
 VALUES
-  ('451 49Ave', 'Delta');
+  ('Business', true, true, true);
 
 INSERT INTO
-  Address
+  Class
 VALUES
-  ('3 Red St', 'Calgary');
+  ('Standard', true, true, false);
 
 INSERT INTO
-  Address
+  Class
 VALUES
-  ('3 3rd Ave', 'Toronto');
+  ('Affordable', true, false, false);
 
 INSERT INTO
-  Address
+  Class
 VALUES
-  ('994 3rd st', 'Halifax');
+  ('Basic', false, false, false);
+
+INSERT INTO
+  Class
+VALUES
+  ('Economy', false, false, false);
+
+INSERT INTO
+  Trip
+VALUES
+  (1, '12:00', '18:00');
+
+INSERT INTO
+  Trip
+VALUES
+  (2, '10:00', '20:00');
+
+INSERT INTO
+  Trip
+VALUES
+  (3, '6:00', '10:00');
+
+INSERT INTO
+  Trip
+VALUES
+  (4, '5:00', '9:00');
+
+INSERT INTO
+  Trip
+VALUES
+  (5, '8:00', '12:00');
 
 INSERT INTO
   Ticket
@@ -228,31 +284,6 @@ INSERT INTO
   Ticket
 VALUES
   (1, 4, 'First', 4);
-
-INSERT INTO
-  Class
-VALUES
-  ('First', true, true, true);
-
-INSERT INTO
-  Class
-VALUES
-  ('Business', true, true, true);
-
-INSERT INTO
-  Class
-VALUES
-  ('Standard', true, true, false);
-
-INSERT INTO
-  Class
-VALUES
-  ('Affordable', true, false, false);
-
-INSERT INTO
-  Class
-VALUES
-  ('Basic', false, false, false);
 
 INSERT INTO
   Train
@@ -510,6 +541,56 @@ VALUES
   (9);
 
 INSERT INTO
+  Station
+VALUES
+  ('Central', 'Central City', 100);
+
+INSERT INTO
+  Station
+VALUES
+  ('East', 'Port City', 100);
+
+INSERT INTO
+  Station
+VALUES
+  ('West', 'Foothills', 10);
+
+INSERT INTO
+  Station
+VALUES
+  ('North', 'Mount Pleasant', 20);
+
+INSERT INTO
+  Station
+VALUES
+  ('South', 'Arbor City', 30);
+
+INSERT INTO
+  Segment
+VALUES
+  (1, 100, NULL, 'East', 'West');
+
+INSERT INTO
+  Segment
+VALUES
+  (2, 200, NULL, 'East', 'Central');
+
+INSERT INTO
+  Segment
+VALUES
+  (3, 150, 'Broken', 'Central', 'West');
+
+INSERT INTO
+  Segment
+VALUES
+  (4, 80, NULL, 'West', 'North');
+
+INSERT INTO
+  Segment
+VALUES
+  (5, 300, NULL, 'South', 'North');
+
+INSERT INTO
   Works_On
 VALUES
   (1, 1);
@@ -608,81 +689,6 @@ INSERT INTO
   Station_Worker
 VALUES
   (15, 'West');
-
-INSERT INTO
-  Station
-VALUES
-  ('Central', 'Central City', 100);
-
-INSERT INTO
-  Station
-VALUES
-  ('East', 'Port City', 100);
-
-INSERT INTO
-  Station
-VALUES
-  ('West', 'Foothills', 10);
-
-INSERT INTO
-  Station
-VALUES
-  ('North', 'Mount Pleasant', 20);
-
-INSERT INTO
-  Station
-VALUES
-  ('South', 'Arbor City', 30);
-
-INSERT INTO
-  Segment
-VALUES
-  (1, 100, NULL, 'East', 'West');
-
-INSERT INTO
-  Segment
-VALUES
-  (2, 200, NULL, 'East', 'Central');
-
-INSERT INTO
-  Segment
-VALUES
-  (3, 150, 'Broken', 'Central', 'West');
-
-INSERT INTO
-  Segment
-VALUES
-  (4, 80, NULL, 'West', 'North');
-
-INSERT INTO
-  Segment
-VALUES
-  (5, 300, NULL, 'South', 'North');
-
-INSERT INTO
-  Trip
-VALUES
-  (1, '12:00', '18:00');
-
-INSERT INTO
-  Trip
-VALUES
-  (2, '10:00', '20:00');
-
-INSERT INTO
-  Trip
-VALUES
-  (3, '6:00', '10:00');
-
-INSERT INTO
-  Trip
-VALUES
-  (4, '5:00', '9:00');
-
-INSERT INTO
-  Trip
-VALUES
-  (5, '8:00', '12:00');
 
 INSERT INTO
   Trip_Leg
