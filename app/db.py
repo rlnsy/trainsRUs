@@ -3,6 +3,35 @@ import time
 
 
 """
+Define errors
+"""
+
+class ConnectionError(Exception):
+  """
+  Thrown when a database transaction cannot be started
+  """
+  def __init__(self):
+    super(ConnectionError, self).__init__("Can't connect to database")
+
+class EmptyQueryError(Exception):
+  """
+  Thrown when input to database execute is empty
+  """
+  def __init__(self):
+    super(EmptyQueryError, self).__init__("Can't execute an empty query, silly")
+
+class DBExecuteError(Exception):
+  """
+  Encapsulates a formatted version of the built-in driver error messages
+  We allow internal driver messages to propogate through for the time being,
+  with the exception of EmptyQueryError
+  """
+  def __init__(self, derror):
+    msg = str(derror).replace("\"", "'").replace("\n", "; ").rstrip('^; ')
+    super(DBExecuteError, self).__init__(msg)
+
+
+"""
 Define database constants
 """
 DB_MAX_CONNECTION_RETRIES = 3
@@ -23,14 +52,7 @@ class PSQLWrapper:
     Initialize a wrapper instance with a null connection and a reference
     to the main application logger
     """
-    self._connection_ = None # contains the single db connection instance
     self._logger_ = logger
-
-  def is_connected(self):
-    """
-    Determine whether the wrapper is connected to the database
-    """
-    return (self._connection_ is not None)
 
   def _log_(self, l, msg):
     """
@@ -41,38 +63,53 @@ class PSQLWrapper:
   def connect(self):
     """
     Attempts to connect to the database.
+    Pollling is only put in place in case a connection attempt is made
+    while the appliction is available externally but the underlying db
+    is not yet started
     """
-    if self.is_connected():
-      raise Exception("Database connection already exists")
-    else:
-      def poll(cur_attempts):
-        try:
-            self._connection_ =  psycopg2.connect(DB_CONNECT_STR)
-            self._log_(self._logger_.info, "Connected to database!")
-        except Exception as e:
-            if (cur_attempts + 1) == DB_MAX_CONNECTION_RETRIES:
-                self._log_(
-                  self._logger_.error, "Connection failed")
-                raise Exception("Could not connect to database")
-            else:
-              time.sleep(1)
-              poll(cur_attempts + 1)
-      self._log_(
-        self._logger_.info, 
-        "Polling the database for TCP connection...")
-      poll(0)
+    def poll(cur_attempts):
+      try:
+          conn =  psycopg2.connect(DB_CONNECT_STR)
+          self._log_(self._logger_.info, "Connected!")
+          return conn
+      except Exception as e:
+          if (cur_attempts + 1) == DB_MAX_CONNECTION_RETRIES:
+              self._log_(
+                self._logger_.error, "Connection failed")
+              raise Exception("Could not connect")
+          else:
+            self._log_(
+                self._logger_.warn, "Connection failed: %s" % str(e))
+            time.sleep(1)
+            return poll(cur_attempts + 1)
+    self._log_(
+      self._logger_.info, 
+      "Polling the database for TCP connection...")
+    return poll(0)
 
-  def close(self):
-    """
-    Close connection to DB
-    """
-    self._connection_.close()
 
   def execute(self, sql):
-    self._log_(self._logger_.info, "%s" % sql)
-    cursor = self._connection_.cursor()
-    cursor.execute(sql)
-    self._connection_.commit()
-    result = cursor.fetchall()
-    cursor.close()
-    return result
+    transaction = None
+    try:
+      transaction = self.connect()
+    except Exception:
+      raise ConnectionError()
+    if len(sql) == 0:
+      self._log_(self._logger_.warn, "Empty query")
+      raise EmptyQueryError()
+    else:
+      try:
+        self._log_(self._logger_.info, "%s" % sql)
+        cursor = transaction.cursor()
+        cursor.execute(sql)
+        transaction.commit()
+        result = cursor.fetchall()
+        return result
+      except Exception as de:
+        self._log_(self._logger_.warn, "Execute error: %s" % str(de))
+        raise DBExecuteError(de)
+      finally:
+        self._log_(self._logger_.debug, "Closing cursor")
+        cursor.close()
+        self._log_(self._logger_.debug, "Closing transaction")
+        transaction.close()
