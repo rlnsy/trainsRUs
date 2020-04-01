@@ -2,6 +2,9 @@ from db import PSQLWrapper
 from utils import ApplicationLogger
 
 
+EXECUTE_TOKEN = "61YYZlA!QkeZ3V7NtY9OPDvN$u7N^E&t"
+
+
 logger = ApplicationLogger()
 dbw = PSQLWrapper(logger)
 
@@ -13,8 +16,18 @@ def init_db_wrapper():
   logger.info("Establishing a test connection to database")
   dbw.connect()
 
+"""
+Define errors used for communication
+"""
 
 class MissingInput(Exception):
+  """
+  Thrown when input to a function is missing
+  require information
+  """
+  pass
+
+class NotAllowed(Exception):
   """
   Thrown when input to a function is missing
   require information
@@ -34,11 +47,16 @@ def sample():
 
 def handle_execute(r):
   command = ""
+  token = "" 
   try:
     command = r['sql']
-  except KeyError:
-    logger.error("Missing SQL field for execute")
-    raise MissingInput("Missing SQL field")
+    token = r['ex_token']
+  except KeyError as ke:
+    msg = ("Missing field %s for execute" % str(ke))
+    logger.info(msg)
+    raise MissingInput(msg)
+  if token != EXECUTE_TOKEN:
+    raise NotAllowed("Invalid execute token")
   try:
     result = dbw.execute(command)
     return {

@@ -67,6 +67,12 @@ def obj_request(k):
         'message': str(e)
       }, 
       status_code=CLIENT_BAD_REQUEST)
+    except engine.NotAllowed as e:
+      return obj_response(
+      {
+        'message': str(e)
+      }, 
+      status_code=CLIENT_FORBIDDEN)
     except Exception as e:
       logger.error("Engine error: %s" % e)
       return obj_response(
