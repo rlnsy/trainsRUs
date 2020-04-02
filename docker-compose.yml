@@ -16,4 +16,4 @@ services:
     build: tests
     depends_on:
       - "application"
-    command: ["python", "tests.py"]
+    command: ["python", "-m", "unittest", "endpoints.py"]
