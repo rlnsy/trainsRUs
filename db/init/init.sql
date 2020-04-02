@@ -82,8 +82,10 @@ CREATE TABLE Works_On (
   maintenance_worker_id int,
   segment_id int,
   PRIMARY KEY (maintenance_worker_id, segment_id),
-  FOREIGN KEY (maintenance_worker_id) REFERENCES Maintenance_Worker(worker_id),
-  FOREIGN KEY (segment_id) REFERENCES Segment(id) ON DELETE CASCADE
+  FOREIGN KEY (maintenance_worker_id)
+    REFERENCES Maintenance_Worker(worker_id) ON DELETE CASCADE,
+  FOREIGN KEY (segment_id)
+    REFERENCES Segment(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Train_Worker (
@@ -114,9 +116,12 @@ CREATE TABLE Works_Shift(
   hours int,
   time char(5),
   PRIMARY KEY (train_worker_id, trip_id, segment_id),
-  FOREIGN KEY (train_worker_id) REFERENCES Train_Worker (worker_id),
-  FOREIGN KEY (trip_id) REFERENCES Trip (id),
-  FOREIGN KEY (segment_id) REFERENCES Segment (id)
+  FOREIGN KEY (train_worker_id) 
+    REFERENCES Train_Worker (worker_id) ON DELETE CASCADE,
+  FOREIGN KEY (trip_id) 
+    REFERENCES Trip (id) ON DELETE CASCADE,
+  FOREIGN KEY (segment_id) 
+    REFERENCES Segment (id) ON DELETE CASCADE
 );
 
 -- Tuples
