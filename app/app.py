@@ -120,6 +120,6 @@ Runtime
 if __name__ == "__main__":
     try:
       engine.init_db_wrapper()
-      app.run(host="0.0.0.0") # TODO change to env variable
+      app.run(host="0.0.0.0", port=6000) # TODO change to env variable
     except Exception as e:
       logger.error("Could not set up database wrapper (see logs)")

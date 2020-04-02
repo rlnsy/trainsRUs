@@ -4,11 +4,16 @@ services:
     build: db
     restart: always
     ports:
-      - "5432:5432"
+      - "5432"
   application:
     build: .
     ports:
-      - "5000:5000"
+      - "5000:6000"
     depends_on:
       - "database"
     command: ["python", "app.py"]
+  tests:
+    build: tests
+    depends_on:
+      - "application"
+    command: ["python", "tests.py"]
