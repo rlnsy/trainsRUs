@@ -3,6 +3,7 @@ from utils import ApplicationLogger
 
 
 EXECUTE_TOKEN = "61YYZlA!QkeZ3V7NtY9OPDvN$u7N^E&t"
+DEFAULT_LOW_ID = 1000 # To avoid conflicts with tuples from init script
 
 
 logger = ApplicationLogger()
@@ -28,6 +29,13 @@ class MissingInput(Exception):
   """
   pass
 
+class InputDomainError(Exception):
+  """
+  Thrown when input to a function is not proper
+  type
+  """
+  pass
+
 class NotAllowed(Exception):
   """
   Thrown when input to a function is missing
@@ -43,7 +51,7 @@ def gen_uid(prefix):
   if len(records) == 0:
     # no id generated
     logger.info("Prefix %s does not exist; creating" % prefix)
-    new_id = 0
+    new_id = DEFAULT_LOW_ID
     dbw.execute("INSERT INTO UID VALUES ('%s', %d)" % (prefix, new_id))
   else:
     # previous id within prefix
@@ -52,6 +60,22 @@ def gen_uid(prefix):
     dbw.execute("UPDATE UID SET cur_id = %d WHERE prefix = '%s'" % (new_id, prefix))
   logger.info("Generated ID: %d" % new_id)
   return new_id
+
+
+"""
+attempt to read values of keys from request
+raising MissingInput if unsuccessful
+"""
+def extract_fields(keys, input):
+  vals = {}
+  for k in keys:
+    try:
+      vals[k] = input[k]
+    except KeyError as ke:
+      msg = ("Input missing field %s" % str(ke))
+      logger.info(msg)
+      raise MissingInput(msg)
+  return vals
 
 
 def sample():
@@ -64,22 +88,14 @@ def sample():
   }
 
 
-def handle_execute(r):
-  command = ""
-  token = "" 
-  try:
-    command = r['sql']
-    token = r['ex_token']
-  except KeyError as ke:
-    msg = ("Missing field %s for execute" % str(ke))
-    logger.info(msg)
-    raise MissingInput(msg)
-  if token != EXECUTE_TOKEN:
+def handle_execute(i):
+  v = extract_fields(['sql', 'ex_token'], i)
+  if v['ex_token'] != EXECUTE_TOKEN:
     raise NotAllowed("Invalid execute token")
   try:
-    result = dbw.execute(command)
+    result = dbw.execute(v['sql'])
     return {
-      'executed': command,
+      'executed': v['sql'],
       'result': str(result)
     }
   except Exception as e:
@@ -87,6 +103,47 @@ def handle_execute(r):
       'attempted': None,
       'error': {
         'message': "Error executing SQL",
+        'cause': str(e)
+      }
+    }
+
+
+"""
+Create worker
+"""
+
+new_worker_tables = {
+  'Train': "Train_Worker" ,
+  'Maintenance': "Maintenance_Worker",
+  'Station': "Station_Worker"
+}
+
+def create_worker(i):
+  v = extract_fields([
+    'firstName', 'lastName', 'phoneNumber', 'role',
+    'availability', 'workerType'
+  ], i)
+  if v['workerType'] not in new_worker_tables:
+    raise InputDomainError("Invalid worker type")
+  wid = gen_uid('worker')
+  try:
+    dbw.execute((
+      """
+      INSERT INTO Worker VALUES (%d, '%s', '%s', '%s', '%s', '%s');
+      """
+      % (wid, 
+      v['firstName'], 
+      v['lastName'], 
+      v['phoneNumber'], 
+      v['role'], 
+      v['availability'])))
+    return {
+    'workerId': wid
+    }
+  except Exception as e:
+    return {
+      'error': {
+        'message': "Error creating worker",
         'cause': str(e)
       }
     }

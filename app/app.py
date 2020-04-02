@@ -61,7 +61,9 @@ def obj_request(k):
     logger.info("Request: %s" % json.dumps(req))
     try:
       return k(req)
-    except engine.MissingInput as e:
+    except (
+      engine.MissingInput, 
+      engine.InputDomainError) as e:
       return obj_response(
       {
         'message': str(e)
@@ -99,12 +101,17 @@ VERSION = "v1"
 def hello():
     return obj_response(engine.sample())
     
-
 @app.route(('/%s/execute' % VERSION), methods=["POST"])
 def execute():
     return obj_request(
       lambda r: 
       obj_response(engine.handle_execute(r), status_code=SUCCESS_CREATE))
+
+@app.route(('/%s/worker' % VERSION), methods=["POST"])
+def worker():
+    return obj_request(
+      lambda r: 
+      obj_response(engine.create_worker(r), status_code=SUCCESS_CREATE))
     
 
 """
