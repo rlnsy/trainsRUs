@@ -17,7 +17,7 @@ SUCCESS_OK = 200
 SUCCESS_CREATE = 201
 CLIENT_BAD_REQUEST = 400
 CLIENT_FORBIDDEN = 403
-CLIENT_NOT_FOUND = 405
+CLIENT_NOT_FOUND = 404
 CLIENT_BAD_METHOD = 405
 SERVER_INTERNAL_ERROR = 500
 SERVER_NOT_IMPLEMENTED = 501
@@ -75,6 +75,12 @@ def obj_request(k):
         'message': str(e)
       }, 
       status_code=CLIENT_FORBIDDEN)
+    except engine.NotFound as e:
+      return obj_response(
+      {
+        'message': str(e)
+      }, 
+      status_code=CLIENT_NOT_FOUND)
     except Exception as e:
       logger.error("Engine error: %s" % e)
       return obj_response(
@@ -107,11 +113,16 @@ def execute():
       lambda r: 
       obj_response(engine.handle_execute(r), status_code=SUCCESS_CREATE))
 
-@app.route(('/%s/worker' % VERSION), methods=["POST"])
+@app.route(('/%s/worker' % VERSION), methods=["POST", "DELETE"])
 def worker():
-    return obj_request(
-      lambda r: 
-      obj_response(engine.create_worker(r), status_code=SUCCESS_CREATE))
+    if request.method == "POST":
+      return obj_request(
+        lambda r: 
+        obj_response(engine.create_worker(r), status_code=SUCCESS_CREATE))
+    else:
+      return obj_request(
+        lambda r: 
+        obj_response(engine.remove_worker(r), status_code=SUCCESS_OK))
     
 
 """

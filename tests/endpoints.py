@@ -152,6 +152,15 @@ class TestEndpoints(unittest.TestCase):
     res = delete(resource("/worker"), data={'workerId': new_id})
     self.assertEqual(res.status_code, 200)
 
+  def test_remove_worker_6(self):
+    new_id = post(
+      resource("/worker"), 
+      data = self.SAMPLE_WORKER, 
+      decode_response=True)['data']['workerId']
+    delete(resource("/worker"), data={'workerId': new_id})
+    res = delete(resource("/worker"), data={'workerId': new_id})
+    self.assertEqual(res.status_code, 404)
+
 
 """
 Runtime procedure

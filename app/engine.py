@@ -35,6 +35,13 @@ class NotAllowed(Exception):
   """
   pass
 
+class NotFound(Exception):
+  """
+  Thrown when a requested instance of a resource
+  is not found
+  """
+  pass
+
 
 """
 Useful engine helpers
@@ -152,4 +159,21 @@ def create_worker(i):
     % (new_worker_tables[v['workerType']], wid)))
   return {
   'workerId': wid
+  }
+
+
+"""
+Remove worker
+"""
+
+def remove_worker(i):
+  v = extract_fields(['workerId'], i)
+  if type(v['workerId']) is not int:
+    raise InputDomainError()
+  search = dbw.execute("SELECT * FROM Worker WHERE id=%d" % v['workerId'])
+  if len(search) == 0:
+    raise NotFound("Worker %d does not exist" % v['workerId'])
+  dbw.execute("DELETE FROM Worker WHERE id=%d" % v['workerId'])
+  return {
+    'message': 'success'
   }
