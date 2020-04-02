@@ -10,16 +10,8 @@ logger = ApplicationLogger()
 dbw = PSQLWrapper(logger)
 
 
-def init_db_wrapper():
-  """
-  Initilize wrapper by testing connection
-  """
-  logger.info("Establishing a test connection to database")
-  dbw.connect()
-
-
 """
-Define errors used for communication
+Define errors used for communication to outer layer
 """
 
 class MissingInput(Exception):
@@ -44,7 +36,21 @@ class NotAllowed(Exception):
   pass
 
 
+"""
+Useful engine helpers
+"""
+
+def init_db_wrapper():
+  """
+  Initilize wrapper by testing connection
+  """
+  logger.info("Establishing a test connection to database")
+  dbw.connect()
+
 def gen_uid(prefix):
+  """
+  generate a unique id within a given prefix group
+  """
   logger.info("Generating UID for %s" % prefix)
   new_id = None
   records = dbw.execute("SELECT cur_id from UID WHERE prefix = '%s'" % prefix)
@@ -61,12 +67,11 @@ def gen_uid(prefix):
   logger.info("Generated ID: %d" % new_id)
   return new_id
 
-
-"""
-attempt to read values of keys from request
-raising MissingInput if unsuccessful
-"""
 def extract_fields(keys, input):
+  """
+  attempt to read values of keys from request
+  raising MissingInput if unsuccessful
+  """
   vals = {}
   for k in keys:
     try:
@@ -78,6 +83,11 @@ def extract_fields(keys, input):
   return vals
 
 
+
+"""
+Functions for sampling and debugging
+"""
+
 def sample():
   query = "SELECT * from Train"
   rows = dbw.execute(query)
@@ -86,7 +96,6 @@ def sample():
     'tuples': str(rows),
     'message': "This is an example of what you can execute on the database!"
   }
-
 
 def handle_execute(i):
   v = extract_fields(['sql', 'ex_token'], i)
@@ -126,24 +135,21 @@ def create_worker(i):
   if v['workerType'] not in new_worker_tables:
     raise InputDomainError("Invalid worker type")
   wid = gen_uid('worker')
-  try:
-    dbw.execute((
-      """
-      INSERT INTO Worker VALUES (%d, '%s', '%s', '%s', '%s', '%s');
-      """
-      % (wid, 
-      v['firstName'], 
-      v['lastName'], 
-      v['phoneNumber'], 
-      v['role'], 
-      v['availability'])))
-    return {
-    'workerId': wid
-    }
-  except Exception as e:
-    return {
-      'error': {
-        'message': "Error creating worker",
-        'cause': str(e)
-      }
-    }
+  dbw.execute((
+    """
+    INSERT INTO Worker VALUES (%d, '%s', '%s', '%s', '%s', '%s');
+    """
+    % (wid, 
+    v['firstName'], 
+    v['lastName'], 
+    v['phoneNumber'], 
+    v['role'], 
+    v['availability'])))
+  dbw.execute((
+    """
+    INSERT INTO %s (worker_id) VALUES (%d);
+    """
+    % (new_worker_tables[v['workerType']], wid)))
+  return {
+  'workerId': wid
+  }
