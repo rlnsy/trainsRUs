@@ -65,7 +65,7 @@ def delete(url, data=None, decode_response=False):
 
 
 """
-Endpoint Tests
+Endpoint Unit Tests
 """
 
 class TestEndpoints(unittest.TestCase):
@@ -74,6 +74,26 @@ class TestEndpoints(unittest.TestCase):
     logger.info("Waiting for API to be available")
     test_api()
     logger.info("Testing endpoints...")
+
+
+  """
+  Worker endpoints
+  """
+
+  SAMPLE_WORKER = {
+    "firstName": "John",
+    "lastName": "Smith",
+    "phoneNumber": "6475234213",
+    "role": "Train Conductor",
+    "availability": "M T Th F",
+    "workerType": "Train" 
+  }
+
+  """ Create """
+
+  def test_create_worker_0(self):
+    res = post(resource("/worker"))
+    self.assertEqual(res.status_code, 400)
 
   def test_create_worker_1(self):
     res = get(resource("/worker"), data={})
@@ -91,35 +111,46 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res.status_code, 400)
 
   def test_create_worker_4(self):
-    values = {
-      "firstName": "John",
-      "lastName": "Smith",
-      "phoneNumber": "6475234213",
-      "role": "Train Conductor",
-      "availability": "M T Th F",
-      "workerType": "Train" 
-    }
     res1 = post(resource("/worker"),
-      data = values, decode_response=True)
+      data = self.SAMPLE_WORKER, decode_response=True)
     if res1['response'].status_code != 201:
       self.fail(res1['response'].text)
     else:
       self.assertIn('workerId', res1['data'])
 
   def test_create_worker_5(self):
-    values = {
-      "firstName": "John",
-      "lastName": "Smith",
-      "phoneNumber": "6475234213",
-      "role": "Train Conductor",
-      "availability": "M T Th F",
-      "workerType": "Train" 
-    }
     create = lambda: post(resource("/worker"),
-      data = values, decode_response=True)
+      data = self.SAMPLE_WORKER, decode_response=True)
     id1 = create()['data']['workerId']
     id2 = create()['data']['workerId']
     self.assertNotEqual(id1, id2)
+
+
+  """ Remove """
+
+  def test_remove_worker_1(self):
+    res = delete(resource("/worker"))
+    self.assertEqual(res.status_code, 400)
+
+  def test_remove_worker_2(self):
+    res = delete(resource("/worker"), data={})
+    self.assertEqual(res.status_code, 400)
+
+  def test_remove_worker_3(self):
+    res = delete(resource("/worker"), data={'id': 12345})
+    self.assertEqual(res.status_code, 400)
+
+  def test_remove_worker_4(self):
+    res = delete(resource("/worker"), data={'workerId': 12345})
+    self.assertEqual(res.status_code, 404)
+
+  def test_remove_worker_5(self):
+    new_id = post(
+      resource("/worker"), 
+      data = self.SAMPLE_WORKER, 
+      decode_response=True)['data']['workerId']
+    res = delete(resource("/worker"), data={'workerId': new_id})
+    self.assertEqual(res.status_code, 200)
 
 
 """
