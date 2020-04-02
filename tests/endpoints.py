@@ -95,10 +95,6 @@ class TestEndpoints(unittest.TestCase):
     res = post(resource("/worker"))
     self.assertEqual(res.status_code, 400)
 
-  def test_create_worker_1(self):
-    res = get(resource("/worker"), data={})
-    self.assertEqual(res.status_code, 405)
-
   def test_create_worker_2(self):
     res = post(resource("/worker"), data={})
     self.assertEqual(res.status_code, 400)
@@ -160,6 +156,38 @@ class TestEndpoints(unittest.TestCase):
     delete(resource("/worker"), data={'workerId': new_id})
     res = delete(resource("/worker"), data={'workerId': new_id})
     self.assertEqual(res.status_code, 404)
+
+
+  """ Worker info """
+
+  def test_worker_info_1(self):
+      res = get(resource("/worker"))
+      self.assertEqual(res.status_code, 400)
+
+  def test_worker_info_2(self):
+    res = get(resource("/worker"), data={})
+    self.assertEqual(res.status_code, 400)
+
+  def test_worker_info_3(self):
+    res = get(resource("/worker"), data={'id': 27837})
+    self.assertEqual(res.status_code, 400)
+
+  def test_worker_info_3_pt5(self):
+    res = get(resource("/worker"), data={'workerId': "27837"})
+    self.assertEqual(res.status_code, 400)
+
+  def test_worker_info_4(self):
+    res = get(resource("/worker"), data={'workerId': 27837})
+    self.assertEqual(res.status_code, 404)
+
+  def test_worker_info_5(self):
+    new_id = post(
+      resource("/worker"), 
+      data = self.SAMPLE_WORKER, 
+      decode_response=True)['data']['workerId']
+    res = get(resource("/worker"), data={'workerId': new_id}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data'], self.SAMPLE_WORKER)
 
 
 """

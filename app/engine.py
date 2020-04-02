@@ -89,6 +89,9 @@ def extract_fields(keys, input):
       raise MissingInput(msg)
   return vals
 
+def trim_char_seq(str):
+  return str.rstrip(' ')
+
 
 
 """
@@ -124,22 +127,22 @@ def handle_execute(i):
     }
 
 
-"""
-Create worker
-"""
-
-new_worker_tables = {
+WORKER_TABLES = {
   'Train': "Train_Worker" ,
   'Maintenance': "Maintenance_Worker",
   'Station': "Station_Worker"
 }
+
+"""
+Create worker
+"""
 
 def create_worker(i):
   v = extract_fields([
     'firstName', 'lastName', 'phoneNumber', 'role',
     'availability', 'workerType'
   ], i)
-  if v['workerType'] not in new_worker_tables:
+  if v['workerType'] not in WORKER_TABLES:
     raise InputDomainError("Invalid worker type")
   wid = gen_uid('worker')
   dbw.execute((
@@ -156,7 +159,7 @@ def create_worker(i):
     """
     INSERT INTO %s (worker_id) VALUES (%d);
     """
-    % (new_worker_tables[v['workerType']], wid)))
+    % (WORKER_TABLES[v['workerType']], wid)))
   return {
   'workerId': wid
   }
@@ -177,3 +180,43 @@ def remove_worker(i):
   return {
     'message': 'success'
   }
+
+
+"""
+Get worker
+"""
+
+def get_single_worker(i):
+  v = extract_fields(['workerId'], i)
+  if type(v['workerId']) is not int:
+    raise InputDomainError()
+  match = None
+  worker_type = None
+  for t in WORKER_TABLES:
+    table = WORKER_TABLES[t]
+    search = dbw.execute(
+    """
+    SELECT
+    * 
+    FROM
+      Worker INNER JOIN %s
+      ON %s.worker_id = Worker.id
+    WHERE
+      Worker.id = %d;
+    """
+    % (table, table, v['workerId']))
+    if len(search) != 0:
+      match = search[0]
+      worker_type = t
+      break
+  if match is None:
+    raise NotFound("Worker %d does not exist" % v['workerId'])
+  else:
+    return {
+      'firstName': trim_char_seq(match[1]),
+      'lastName': trim_char_seq(match[2]),
+      'phoneNumber': trim_char_seq(match[3]),
+      'role': trim_char_seq(match[4]),
+      'availability': trim_char_seq(match[5]),
+      'workerType': worker_type
+    }
