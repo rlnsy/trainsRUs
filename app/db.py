@@ -103,8 +103,12 @@ class PSQLWrapper:
         cursor = transaction.cursor()
         cursor.execute(sql)
         transaction.commit()
-        result = cursor.fetchall()
-        return result
+        try:
+          result = cursor.fetchall()
+          return result
+        except Exception:
+          # command is essentially void return type e.g. INSERT
+          return None
       except Exception as de:
         self._log_(self._logger_.warn, "Execute error: %s" % str(de))
         raise DBExecuteError(de)

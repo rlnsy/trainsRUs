@@ -16,6 +16,7 @@ def init_db_wrapper():
   logger.info("Establishing a test connection to database")
   dbw.connect()
 
+
 """
 Define errors used for communication
 """
@@ -33,6 +34,24 @@ class NotAllowed(Exception):
   require information
   """
   pass
+
+
+def gen_uid(prefix):
+  logger.info("Generating UID for %s" % prefix)
+  new_id = None
+  records = dbw.execute("SELECT cur_id from UID WHERE prefix = '%s'" % prefix)
+  if len(records) == 0:
+    # no id generated
+    logger.info("Prefix %s does not exist; creating" % prefix)
+    new_id = 0
+    dbw.execute("INSERT INTO UID VALUES ('%s', %d)" % (prefix, new_id))
+  else:
+    # previous id within prefix
+    cur_id = records[0][0]
+    new_id = cur_id + 1
+    dbw.execute("UPDATE UID SET cur_id = %d WHERE prefix = '%s'" % (new_id, prefix))
+  logger.info("Generated ID: %d" % new_id)
+  return new_id
 
 
 def sample():
