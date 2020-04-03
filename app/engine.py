@@ -434,6 +434,7 @@ def schedule_shift(i):
       AND
       segment_id = %d
     """ % (v['workerId'], v['tripId'], v['segmentId']))
+    # TODO: create a get shift helper
   if len(search) > 0:
     raise NotAllowed("Shift already exists and you cannot add it again")
   dbw.execute((
@@ -455,5 +456,34 @@ Remove worker shift
 """
 
 def remove_shift(i):
-  raise HandlerNotImplemented()
+  v = extract_fields(
+    [
+      'workerId', 'tripId', 'segmentId'
+    ], i)
+  search = dbw.execute(
+    """
+    SELECT * FROM Works_Shift 
+    WHERE 
+      train_worker_id = %d
+      AND
+      trip_id = %d
+      AND
+      segment_id = %d
+    """ % (v['workerId'], v['tripId'], v['segmentId']))
+    # TODO: create a get shift helper
+  if len(search) == 0:
+    raise NotFound("Requested shift does not exist")
+  dbw.execute(
+    """
+    DELETE FROM Works_Shift 
+    WHERE 
+      train_worker_id = %d
+      AND
+      trip_id = %d
+      AND
+      segment_id = %d
+    """ % (v['workerId'], v['tripId'], v['segmentId']))
+  return {
+    'message': "Shift deleted"
+  }
 

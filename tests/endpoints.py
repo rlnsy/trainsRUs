@@ -488,6 +488,54 @@ class TestEndpoints(unittest.TestCase):
     self.assertIn('message', res['data'])
 
 
+  """ Drop shift """
+
+  def test_remove_shift_1(self):
+    res = delete(resource("/shift"),
+      data={})
+    self.assertEqual(res.status_code, 400)
+    res = delete(resource("/shift"),
+      data={'workerId': 3})
+    self.assertEqual(res.status_code, 400)
+    res = delete(resource("/shift"),
+      data={'workerId': 3, 'segmentId': 4})
+    self.assertEqual(res.status_code, 400)
+
+  def test_remove_shift_2(self):
+    res = delete(resource("/shift"),
+      data={
+        'workerId': 33039, 
+        'segmentId': 39030,
+        'tripId': 39303
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_remove_shift_3(self):
+    res = delete(resource("/shift"),
+      data={
+        'workerId': 4,
+        'tripId': 1, 
+        'segmentId': 2
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_remove_shift_4(self):
+    res = delete(resource("/shift"),
+      data={
+        'workerId': 4,
+        'tripId': 1, 
+        'segmentId': 1
+      })
+    self.assertEqual(res.status_code, 200)
+    res = delete(resource("/shift"),
+      data={
+        'workerId': 4,
+        'tripId': 1, 
+        'segmentId': 1
+      })
+    self.assertEqual(res.status_code, 404)
+
+
 
 """
 Runtime procedure
