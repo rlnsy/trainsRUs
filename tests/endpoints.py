@@ -44,15 +44,19 @@ def test_api():
 Test helpers
 """
 def _create_req_(method, url, data, decode_response):
+  logger.info("Making request: %s" % json.dumps(data))
   res = method(
     url, 
-    data=json.dumps(data) if data else None, 
+    data=json.dumps(data) if (data is not None) else None, 
     headers={'Content-Type':"application/json"})
   if decode_response:
-    return {
-      'response': res,
-      'data': json.loads(res.text)
-    }
+    try:
+      return {
+        'response': res,
+        'data': json.loads(res.text)
+      }
+    except json.decoder.JSONDecodeError:
+      raise Exception("Unparsable response: %s" % str(res.text))
   else:
     return res
 def get(url, data=None, decode_response=False):
@@ -237,6 +241,43 @@ class TestEndpoints(unittest.TestCase):
     self.assertNotEqual(updated, self.SAMPLE_WORKER)
     self.assertEqual(updated, slightly_different_worker)
 
+
+  """
+  Maintenance worker endpoints
+  """
+
+  NUM_INIT_SEGMENTS = 5
+
+  """ Get segment status """
+
+  def test_segment_status_1(self):
+    res = get(resource("/segment"), data={}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    results = res['data']
+    self.assertEqual(len(results), self.NUM_INIT_SEGMENTS)
+    self.assertEqual(results[0],
+      {
+        'segmentId': 1,
+        'status': None
+      })
+    self.assertEqual(results[2],
+      {
+        'segmentId': 3,
+        'status': "Broken"
+      })
+
+  def test_segment_status_2(self):
+    res = get(resource("/segment"), data={
+      'workerId': 6
+    }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    results = res['data']
+    self.assertEqual(len(results), 1)
+    self.assertEqual(results[0],
+      {
+        'segmentId': 2,
+        'status': None
+      })
 
 
 """

@@ -90,7 +90,7 @@ def extract_fields(keys, input):
   return vals
 
 def trim_char_seq(str):
-  return str.rstrip(' ')
+  return str.rstrip(' ') if (str is not None) else None
 
 
 
@@ -266,3 +266,33 @@ def update_worker(i):
   return {
     'message': 'success'
   }
+
+
+"""
+Get segments
+"""
+
+def get_segments(i):
+  wid = None
+  if 'workerId' in i:
+    wid = i['workerId']
+  data = []
+  query = None
+  if wid is None:
+    query = "SELECT id, condition FROM Segment;"
+  else:
+    query = ("""
+    SELECT
+      id, condition
+    FROM
+      Segment INNER JOIN Works_On
+      ON Works_On.segment_id = Segment.id
+    WHERE
+      Works_On.maintenance_worker_id = %d;
+    """ % wid)
+  for t in dbw.execute(query):
+    data.append({
+      'segmentId': t[0],
+      'status': trim_char_seq(t[1])
+    })
+  return data

@@ -29,7 +29,7 @@ Request and response helpers that enforce JSON
 compliance
 """
 
-def obj_response(o, status_code=SUCCESS_OK):
+def json_response(o, status_code=SUCCESS_OK):
   """
   Return a response object containing JSON data
   o is the python object (dict) to encode, must
@@ -52,7 +52,7 @@ def obj_request(k):
   """
   req = request.get_json()
   if req is None or not isinstance(req,dict):
-    return obj_response(
+    return json_response(
       {
         'message': "You gotta give me a JSON object"
       }, 
@@ -64,26 +64,26 @@ def obj_request(k):
     except (
       engine.MissingInput, 
       engine.InputDomainError) as e:
-      return obj_response(
+      return json_response(
       {
         'message': str(e)
       }, 
       status_code=CLIENT_BAD_REQUEST)
     except engine.NotAllowed as e:
-      return obj_response(
+      return json_response(
       {
         'message': str(e)
       }, 
       status_code=CLIENT_FORBIDDEN)
     except engine.NotFound as e:
-      return obj_response(
+      return json_response(
       {
         'message': str(e)
       }, 
       status_code=CLIENT_NOT_FOUND)
     except Exception as e:
       logger.error("Engine error: %s" % e)
-      return obj_response(
+      return json_response(
       {
         'message': "An internal engine error occurred"
       }, 
@@ -103,34 +103,40 @@ Routes
 
 VERSION = "v1"
 
-@app.route(('/%s/' % VERSION), methods=["GET"])
+@app.route(("/%s/" % VERSION), methods=["GET"])
 def hello():
-    return obj_response(engine.sample())
+    return json_response(engine.sample())
     
-@app.route(('/%s/execute' % VERSION), methods=["POST"])
+@app.route(("/%s/execute" % VERSION), methods=["POST"])
 def execute():
     return obj_request(
       lambda r: 
-      obj_response(engine.handle_execute(r), status_code=SUCCESS_CREATE))
+      json_response(engine.handle_execute(r), status_code=SUCCESS_CREATE))
 
-@app.route(('/%s/worker' % VERSION), methods=["POST", "DELETE", "GET", "PUT"])
+@app.route(("/%s/worker" % VERSION), methods=["POST", "DELETE", "GET", "PUT"])
 def worker():
-    if request.method == "POST":
-      return obj_request(
-        lambda r: 
-        obj_response(engine.create_worker(r), status_code=SUCCESS_CREATE))
-    elif request.method == "DELETE":
-      return obj_request(
-        lambda r: 
-        obj_response(engine.remove_worker(r), status_code=SUCCESS_OK))
-    elif request.method == "GET":
-      return obj_request(
-        lambda r: 
-        obj_response(engine.get_single_worker(r), status_code=SUCCESS_OK))
-    else:
-      return obj_request(
-        lambda r: 
-        obj_response(engine.update_worker(r), status_code=SUCCESS_CREATE))
+  if request.method == "POST":
+    return obj_request(
+      lambda r: 
+      json_response(engine.create_worker(r), status_code=SUCCESS_CREATE))
+  elif request.method == "DELETE":
+    return obj_request(
+      lambda r: 
+      json_response(engine.remove_worker(r), status_code=SUCCESS_OK))
+  elif request.method == "GET":
+    return obj_request(
+      lambda r: 
+      json_response(engine.get_single_worker(r), status_code=SUCCESS_OK))
+  else:
+    return obj_request(
+      lambda r: 
+      json_response(engine.update_worker(r), status_code=SUCCESS_CREATE))
+
+@app.route(("/%s/segment" % VERSION), methods=["GET"])
+def segment():
+  return obj_request(
+    lambda r: 
+    json_response(engine.get_segments(r), status_code=SUCCESS_OK))
     
 
 """
