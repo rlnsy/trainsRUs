@@ -410,7 +410,6 @@ class TestEndpoints(unittest.TestCase):
         'workerId': 10
       }, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
-    self.assertEqual(len(res['data']), 2)
     self.assertEqual(res['data'][0]['startTime'], '8:00')
     self.assertEqual(res['data'][0]['numHours'], 6)
     self.assertEqual(res['data'][1]['startTime'], '13:00')
@@ -442,14 +441,18 @@ class TestEndpoints(unittest.TestCase):
     res = post(resource("/shift"),
       data={
         'workerId': 1,
-        'tripId': 2,
-        'segmentId': 3215672,
+        'tripId': 3215672,
+        'segmentId': 2,
         'numHours': 6,
         'startTime': "10:00"
     })
     self.assertEqual(res.status_code, 404)
 
   def test_create_shift_3(self):
+    """
+    tests the case where worker id is not for a
+    train worker
+    """
     res = post(resource("/shift"),
       data={
         'workerId': 1,
@@ -457,9 +460,32 @@ class TestEndpoints(unittest.TestCase):
         'segmentId': 3,
         'numHours': 6,
         'startTime': "10:00"
+    })
+    self.assertEqual(res.status_code, 404)
+
+  def test_create_shift_4(self):
+    res = post(resource("/shift"),
+      data={
+        'workerId': 10,
+        'tripId': 2,
+        'segmentId': 3,
+        'numHours': 6,
+        'startTime': "10:00"
     }, decode_response=True)
     self.assertEqual(res['response'].status_code, 201)
     self.assertEqual(res['data']['message'], "Shift created")
+
+  def test_create_shift_5(self):
+    res = post(resource("/shift"),
+      data={
+        'workerId': 10,
+        'tripId': 2,
+        'segmentId': 3,
+        'numHours': 6,
+        'startTime': "10:00"
+    }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 403)
+    self.assertIn('message', res['data'])
 
 
 

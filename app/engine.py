@@ -196,7 +196,7 @@ def remove_worker(i):
 Get worker
 """
 
-def get_single_worker(i):
+def get_single_worker(i, target_worker_type=None):
   v = extract_fields(['workerId'], i)
   if type(v['workerId']) is not int:
     raise InputDomainError()
@@ -222,6 +222,10 @@ def get_single_worker(i):
   if match is None:
     raise NotFound("Worker %d does not exist" % v['workerId'])
   else:
+    if ((worker_type != target_worker_type) and 
+        (target_worker_type is not None)):
+      raise NotFound(
+    "Worker %d is not of type %s" % (v['workerId'], target_worker_type))
     return {
       'firstName': trim_char_seq(match[1]),
       'lastName': trim_char_seq(match[2]),
@@ -341,7 +345,7 @@ def get_segment_info(i):
     SELECT * FROM Segment WHERE id = %d;
     """ % v['segmentId']) 
   if len(search) == 0:
-    raise NotFound("Worker %d does not exist" % v['segmentId'])
+    raise NotFound("Segment %d does not exist" % v['segmentId'])
   else:
     match = search[0]
     return {
@@ -394,6 +398,23 @@ def get_worker_shifts(i):
 Schedule worker shift
 """
 
+def get_trip_info(i):
+  v = extract_fields(['tripId'], i)
+  if type(v['tripId']) is not int:
+    raise InputDomainError()
+  search = dbw.execute(
+    """
+    SELECT * FROM Trip WHERE id = %d;
+    """ % v['tripId']) 
+  if len(search) == 0:
+    raise NotFound("Trip %d does not exist" % v['tripId'])
+  else:
+    match = search[0]
+    return {
+    'departureTime': trim_char_seq(match[1]),
+    'arrivalTime': trim_char_seq(match[2])
+  }
+
 def schedule_shift(i):
   v = extract_fields(
     [
@@ -401,9 +422,32 @@ def schedule_shift(i):
       'numHours', 'startTime'
     ], i)
   get_segment_info(v)
-  get_single_worker(v)
-  # TODO get_trip_info(v)
-  raise HandlerNotImplemented()
+  get_single_worker(v, target_worker_type='Train')
+  get_trip_info(v)
+  search = dbw.execute(
+    """
+    SELECT * FROM Works_Shift 
+    WHERE 
+      train_worker_id = %d
+      AND
+      trip_id = %d
+      AND
+      segment_id = %d
+    """ % (v['workerId'], v['tripId'], v['segmentId']))
+  if len(search) > 0:
+    raise NotAllowed("Shift already exists and you cannot add it again")
+  dbw.execute((
+    """
+    INSERT INTO Works_Shift VALUES (%d, '%d', '%d', '%d', '%s');
+    """
+    % (v['workerId'], 
+    v['tripId'], 
+    v['segmentId'], 
+    v['numHours'], 
+    v['startTime'])))
+  return {
+    'message': "Shift created"
+  }
 
 
 """
