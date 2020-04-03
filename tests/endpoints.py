@@ -261,17 +261,14 @@ class TestEndpoints(unittest.TestCase):
     res = get(resource("/segment/status"), data={}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     results = res['data']
-    self.assertEqual(len(results), self.NUM_INIT_SEGMENTS)
-    self.assertEqual(results[0],
-      {
+    self.assertIn({
         'segmentId': 1,
         'status': None
-      })
-    self.assertEqual(results[2],
-      {
+      }, results)
+    self.assertIn({
         'segmentId': 3,
         'status': "Broken"
-      })
+      }, results)
 
   def test_segment_status_2(self):
     res = get(resource("/segment/status"), data={
@@ -285,48 +282,6 @@ class TestEndpoints(unittest.TestCase):
         'segmentId': 2,
         'status': None
       })
-
-
-  """ Update status """
-
-  def test_update_status_1(self):
-    res = put(resource("/segment/status"), data={})
-    self.assertEqual(res.status_code, 400)
-    res = put(resource("/segment/status"),
-      data={
-        'segmentId': 3
-      })
-    self.assertEqual(res.status_code, 400)
-    res = put(resource("/segment/status"),
-      data={
-        'newStatus': "Broken"
-      })
-    self.assertEqual(res.status_code, 400)
-
-  def test_update_status_3(self):
-    res = put(resource("/segment/status"),
-      data={
-        'segmentId': 1,
-        'newStatus': "Broken"
-      })
-    self.assertEqual(res.status_code, 201)
-    res = get(resource("/segment/status"), data={}, decode_response=True)
-    self.assertEqual(res['response'].status_code, 200)
-    results = res['data']
-    self.assertEqual(len(results), self.NUM_INIT_SEGMENTS)
-    self.assertEqual(results[0],
-      {
-        'segmentId': 1,
-        'status': "Broken"
-      })
-
-  def test_update_status_4(self):
-    res = put(resource("/segment/status"),
-      data={
-        'segmentId': 9999,
-        'newStatus': "Broken"
-      })
-    self.assertEqual(res.status_code, 404)
 
   
   """ Add segment """
@@ -385,8 +340,51 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res['data'], self.SAMPLE_SEGMENT)
 
 
+  """ Update status """
+
+  def test_update_status_1(self):
+    res = put(resource("/segment/status"), data={})
+    self.assertEqual(res.status_code, 400)
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 3
+      })
+    self.assertEqual(res.status_code, 400)
+    res = put(resource("/segment/status"),
+      data={
+        'newStatus': "Broken"
+      })
+    self.assertEqual(res.status_code, 400)
+
+  def test_update_status_3(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 1,
+        'newStatus': "Broken"
+      })
+    self.assertEqual(res.status_code, 201)
+    res = get(resource("/segment"), data={'segmentId': 1}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data'],
+      {
+        'condition': "Broken",
+        'endStation': "West",
+        'startStation': "East",
+        'trackLength': 100
+      })
+
+  def test_update_status_4(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 9999,
+        'newStatus': "Broken"
+      })
+    self.assertEqual(res.status_code, 404)
+
+
 """
 Runtime procedure
 """
 if __name__ == '__main__':
+  unittest.TestLoader.sortTestMethodsUsing = None
   unittest.main()

@@ -323,8 +323,34 @@ def create_segment(i):
     v['startStation'], 
     v['endStation'])))
   return {
-  'segmentId': sid
+    'message': "Segment created",
+    'segmentId': sid
   }
+
+
+"""
+Get Segment info
+"""
+
+def get_segment_info(i):
+  v = extract_fields(['segmentId'], i)
+  if type(v['segmentId']) is not int:
+    raise InputDomainError()
+  search = dbw.execute(
+    """
+    SELECT * FROM Segment WHERE id = %d;
+    """ % v['segmentId']) 
+  if len(search) == 0:
+    raise NotFound("Worker %d does not exist" % v['segmentId'])
+  else:
+    match = search[0]
+    return {
+    'trackLength': match[1],
+    'condition': trim_char_seq(match[2]),
+    'startStation': trim_char_seq(match[3]),
+    'endStation': trim_char_seq(match[4])
+  }
+
 
 """
 Update Segment status
@@ -332,11 +358,11 @@ Update Segment status
 
 def update_segment(i):
   v = extract_fields(['segmentId', 'newStatus'], i)
-  raise HandlerNotImplemented("Update segment not implemented")
-
-"""
-Get Segment info
-"""
-
-def get_segment_info(i):
-  raise HandlerNotImplemented("Segment info not implemented")
+  seg = get_segment_info({ 'segmentId': v['segmentId'] })
+  dbw.execute(
+    """
+    UPDATE Segment SET condition = '%s' WHERE id = %d;
+    """ % (v['newStatus'], v['segmentId']))
+  return {
+    'message': 'Segment updated'
+  }
