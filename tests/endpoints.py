@@ -416,6 +416,53 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res['data'][1]['startTime'], '13:00')
 
 
+  """ Schedule shift """
+
+  def test_create_shift_1(self):
+    res = post(resource("/shift"),
+      data={})
+    self.assertEqual(res.status_code, 400)
+    res = post(resource("/shift"),
+      data={'workerId': 3})
+    self.assertEqual(res.status_code, 400)
+    res = post(resource("/shift"),
+      data={'workerId': 3, 'segmentId': 4})
+    self.assertEqual(res.status_code, 400)
+
+  def test_create_shift_2(self):
+    res = post(resource("/shift"),
+      data={
+        'workerId': 1234567,
+        'tripId': 1234567,
+        'segmentId': 3215672,
+        'numHours': 6,
+        'startTime': "10:00"
+    })
+    self.assertEqual(res.status_code, 404)
+    res = post(resource("/shift"),
+      data={
+        'workerId': 1,
+        'tripId': 2,
+        'segmentId': 3215672,
+        'numHours': 6,
+        'startTime': "10:00"
+    })
+    self.assertEqual(res.status_code, 404)
+
+  def test_create_shift_3(self):
+    res = post(resource("/shift"),
+      data={
+        'workerId': 1,
+        'tripId': 2,
+        'segmentId': 3,
+        'numHours': 6,
+        'startTime': "10:00"
+    }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 201)
+    self.assertEqual(res['data']['message'], "Shift created")
+
+
+
 """
 Runtime procedure
 """

@@ -395,6 +395,14 @@ Schedule worker shift
 """
 
 def schedule_shift(i):
+  v = extract_fields(
+    [
+      'workerId', 'tripId', 'segmentId', 
+      'numHours', 'startTime'
+    ], i)
+  get_segment_info(v)
+  get_single_worker(v)
+  # TODO get_trip_info(v)
   raise HandlerNotImplemented()
 
 
