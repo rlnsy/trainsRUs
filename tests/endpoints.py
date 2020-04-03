@@ -247,9 +247,8 @@ class TestEndpoints(unittest.TestCase):
   """
 
   SAMPLE_SEGMENT = {
-    'trackLengh': 100,
+    'trackLength': 100,
     'condition': "Looking Good",
-    'role': "Train Conductor",
     'startStation': "West",
     'endStation': "North"
   }
@@ -335,7 +334,7 @@ class TestEndpoints(unittest.TestCase):
   def test_add_segment_1(self):
     res = post(resource("/segment"), data={})
     self.assertEqual(res.status_code, 400)
-    res = put(resource("/segment"),
+    res = post(resource("/segment"),
       data={
         'trackLength': 3,
         'condition': "Looking Good"
@@ -356,7 +355,9 @@ class TestEndpoints(unittest.TestCase):
   def test_add_segment_3(self):
     res = post(resource("/segment"),
       data=self.SAMPLE_SEGMENT, decode_response=True)
-    self.assertEqual(res['response'].status_code, 201)
+    if res['response'].status_code != 201:
+      logger.debug(json.dumps(res['data']))
+      self.fail()
     self.assertIn('segmentId', res['data'])
 
 

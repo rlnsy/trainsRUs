@@ -310,7 +310,21 @@ Create segment
 """
 
 def create_segment(i):
-  raise HandlerNotImplemented("Create segment not implemented")
+  v = extract_fields(
+    ['trackLength', 'condition', 'startStation', 'endStation'], i)
+  sid = gen_uid('segment')
+  dbw.execute((
+    """
+    INSERT INTO Segment VALUES (%d, '%d', '%s', '%s', '%s');
+    """
+    % (sid, 
+    v['trackLength'], 
+    v['condition'], 
+    v['startStation'], 
+    v['endStation'])))
+  return {
+  'segmentId': sid
+  }
 
 """
 Update Segment status
