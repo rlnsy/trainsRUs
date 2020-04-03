@@ -180,6 +180,21 @@ def ticket_info():
   return obj_request(
       lambda r: 
       json_response(engine.get_ticket_info(r), status_code=SUCCESS_OK))
+
+@app.route(("/%s/station" % VERSION_1), methods=["GET", "PUT", "POST"])
+def station():
+  if request.method == "GET":
+    return obj_request(
+      lambda r: 
+      json_response(engine.get_station(r), status_code=SUCCESS_OK))
+  elif request.method == "PUT":
+    return obj_request(
+      lambda r: 
+      json_response(engine.update_station(r), status_code=SUCCESS_CREATE))
+  elif request.method == "POST":
+    return obj_request(
+      lambda r: 
+      json_response(engine.create_station(r), status_code=SUCCESS_CREATE))
       
 
 """

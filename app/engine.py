@@ -558,3 +558,17 @@ def get_ticket_info(i):
       'class': ticketclass
     }
 
+
+"""
+Station stuff
+"""
+
+def create_station(i):
+  raise HandlerNotImplemented()
+
+def get_station(i):
+  raise HandlerNotImplemented()
+
+def update_station(i):
+  raise HandlerNotImplemented()
+
