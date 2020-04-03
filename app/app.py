@@ -107,19 +107,19 @@ logger = ApplicationLogger()
 Routes
 """
 
-VERSION = "v1"
+VERSION_1 = "v1"
 
-@app.route(("/%s/" % VERSION), methods=["GET"])
+@app.route(("/%s/" % VERSION_1), methods=["GET"])
 def hello():
     return json_response(engine.sample())
     
-@app.route(("/%s/execute" % VERSION), methods=["POST"])
+@app.route(("/%s/execute" % VERSION_1), methods=["POST"])
 def execute():
     return obj_request(
       lambda r: 
       json_response(engine.handle_execute(r), status_code=SUCCESS_CREATE))
 
-@app.route(("/%s/worker" % VERSION), methods=["POST", "DELETE", "GET", "PUT"])
+@app.route(("/%s/worker" % VERSION_1), methods=["POST", "DELETE", "GET", "PUT"])
 def worker():
   if request.method == "POST":
     return obj_request(
@@ -138,7 +138,7 @@ def worker():
       lambda r: 
       json_response(engine.update_worker(r), status_code=SUCCESS_CREATE))
 
-@app.route(("/%s/segment/status" % VERSION), methods=["GET", "PUT"])
+@app.route(("/%s/segment/status" % VERSION_1), methods=["GET", "PUT"])
 def segment_status():
   if request.method == "GET":
     return obj_request(
@@ -149,7 +149,7 @@ def segment_status():
       lambda r: 
       json_response(engine.update_segment(r), status_code=SUCCESS_CREATE))
 
-@app.route(("/%s/segment" % VERSION), methods=["GET", "POST"])
+@app.route(("/%s/segment" % VERSION_1), methods=["GET", "POST"])
 def segment():
   if request.method == "GET":
     return obj_request(
@@ -159,6 +159,21 @@ def segment():
     return obj_request(
       lambda r: 
       json_response(engine.create_segment(r), status_code=SUCCESS_CREATE))
+  
+@app.route(("/%s/shift" % VERSION_1), methods=["GET", "POST", "DELETE"])
+def shiftt():
+  if request.method == "GET":
+    return obj_request(
+      lambda r: 
+      json_response(engine.get_worker_shifts(r), status_code=SUCCESS_OK))
+  elif request.method == "POST":
+    return obj_request(
+      lambda r: 
+      json_response(engine.schedule_shift(r), status_code=SUCCESS_CREATE))
+  elif request.method == "DELETE":
+    return obj_request(
+      lambda r: 
+      json_response(engine.remove_shift(r), status_code=SUCCESS_OK))
       
 
 """

@@ -358,7 +358,7 @@ Update Segment status
 
 def update_segment(i):
   v = extract_fields(['segmentId', 'newStatus'], i)
-  seg = get_segment_info({ 'segmentId': v['segmentId'] })
+  get_segment_info({ 'segmentId': v['segmentId'] })
   dbw.execute(
     """
     UPDATE Segment SET condition = '%s' WHERE id = %d;
@@ -366,3 +366,42 @@ def update_segment(i):
   return {
     'message': 'Segment updated'
   }
+
+
+"""
+Get worker shifts
+"""
+
+def get_worker_shifts(i):
+  v = extract_fields(['workerId'], i)
+  wid = v['workerId']
+  results = []
+  for r in dbw.execute(
+    """
+    SELECT * from Works_Shift
+    WHERE train_worker_id = %d
+    """ % wid):
+    results.append({
+      'tripId': r[1],
+      'segmentId': r[2],
+      'numHours': r[3],
+      'startTime': trim_char_seq(r[4])
+    })
+  return results
+
+
+"""
+Schedule worker shift
+"""
+
+def schedule_shift(i):
+  raise HandlerNotImplemented()
+
+
+"""
+Remove worker shift
+"""
+
+def remove_shift(i):
+  raise HandlerNotImplemented()
+

@@ -516,6 +516,18 @@ VALUES
   );
 
 INSERT INTO
+  Worker
+VALUES
+  (
+    16,
+    'Liam',
+    'Armstrong',
+    Null,
+    'Conductor',
+    'M T W Th F'
+  );
+
+INSERT INTO
   Maintenance_Worker
 VALUES
   (1);
@@ -641,6 +653,11 @@ VALUES
   (13);
 
 INSERT INTO
+  Train_Worker
+VALUES
+  (16);
+
+INSERT INTO
   Works_Shift
 VALUES
   (4, 1, 1, 8, '8:00');
@@ -649,6 +666,11 @@ INSERT INTO
   Works_Shift
 VALUES
   (10, 2, 2, 6, '8:00');
+
+INSERT INTO
+  Works_Shift
+VALUES
+  (10, 5, 2, 6, '13:00');
 
 INSERT INTO
   Works_Shift

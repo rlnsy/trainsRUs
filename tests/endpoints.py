@@ -382,6 +382,40 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res.status_code, 404)
 
 
+  """
+  Train worker endpoints
+  """
+
+  """ Get shifts """
+
+  def test_get_shifts_1(self):
+    res = get(resource("/shift"),
+      data={})
+    self.assertEqual(res.status_code, 400)
+    res = get(resource("/shift"),
+      data={'idk': 3})
+    self.assertEqual(res.status_code, 400)
+
+  def test_get_shifts_2(self):
+    res = get(resource("/shift"),
+      data={
+        'workerId': 16
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(len(res['data']), 0)
+
+  def test_get_shifts_3(self):
+    res = get(resource("/shift"),
+      data={
+        'workerId': 10
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(len(res['data']), 2)
+    self.assertEqual(res['data'][0]['startTime'], '8:00')
+    self.assertEqual(res['data'][0]['numHours'], 6)
+    self.assertEqual(res['data'][1]['startTime'], '13:00')
+
+
 """
 Runtime procedure
 """
