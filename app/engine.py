@@ -133,15 +133,18 @@ WORKER_TABLES = {
   'Station': "Station_Worker"
 }
 
+WORKER_FIELDS = [
+    'firstName', 'lastName', 'phoneNumber', 'role',
+    'availability', 'workerType'
+]
+
+
 """
 Create worker
 """
 
 def create_worker(i):
-  v = extract_fields([
-    'firstName', 'lastName', 'phoneNumber', 'role',
-    'availability', 'workerType'
-  ], i)
+  v = extract_fields(WORKER_FIELDS, i)
   if v['workerType'] not in WORKER_TABLES:
     raise InputDomainError("Invalid worker type")
   wid = gen_uid('worker')
@@ -220,3 +223,46 @@ def get_single_worker(i):
       'availability': trim_char_seq(match[5]),
       'workerType': worker_type
     }
+
+
+"""
+Update worker
+"""
+
+def update_worker(i):
+  wid = extract_fields(['workerId'], i)['workerId']
+  worker_data = get_single_worker({'workerId': wid})
+  n_updates = 0
+  for key in i:
+    if key != 'workerId':
+      if key not in WORKER_FIELDS:
+        raise InputDomainError
+      else:
+        n_updates += 1
+        worker_data[key] = i[key]
+  if n_updates == 0:
+    raise MissingInput("Request contains no updates")
+  command = (
+    """
+    UPDATE Worker
+    SET
+    first_name = '%s',
+    last_name = '%s',
+    phone_number = '%s',
+    role_name = '%s',
+    availability = '%s'
+    WHERE id = '%d'
+    """ % (
+    worker_data['firstName'],
+    worker_data['lastName'],
+    worker_data['phoneNumber'],
+    worker_data['role'],
+    worker_data['availability'],
+    wid))
+  try:
+    dbw.execute(command)
+  except TypeError as te:
+    raise InputDomainError(str(te))
+  return {
+    'message': 'success'
+  }

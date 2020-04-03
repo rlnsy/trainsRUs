@@ -4,6 +4,7 @@ import time
 from utils import TestLogger
 import sys
 import json
+import copy
 
 
 """
@@ -188,6 +189,54 @@ class TestEndpoints(unittest.TestCase):
     res = get(resource("/worker"), data={'workerId': new_id}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'], self.SAMPLE_WORKER)
+
+
+  """ Update """
+
+  def test_update_worker_1(self):
+    res = put(resource("/worker"), data={'workerId': 1})
+    self.assertEqual(res.status_code, 400)
+
+  def test_update_worker_2(self):
+    res = put(resource("/worker"), 
+      data={
+        'workerId': 47378,
+        'firstName': 'Adam'
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_update_worker_3(self):
+    res = put(resource("/worker"), 
+      data={
+        'workerId': 1,
+        'firstName': 'Adam',
+        'favouriteColour': 'blue'
+      })
+    self.assertEqual(res.status_code, 400)
+
+  def test_update_worker_4(self):
+    new_id = post(
+      resource("/worker"), 
+      data = self.SAMPLE_WORKER, 
+      decode_response=True)['data']['workerId']
+    new_name = "Adam"
+    new_phone = "(123) 456-7890"
+    slightly_different_worker = copy.deepcopy(self.SAMPLE_WORKER)
+    slightly_different_worker['firstName'] = new_name
+    slightly_different_worker['phoneNumber'] = new_phone
+    res = put(resource("/worker"), 
+      data={
+        'workerId': new_id,
+        'firstName': new_name,
+        'phoneNumber': new_phone
+      })
+    self.assertEqual(res.status_code, 201)
+    res2 = get(resource("/worker"), data={'workerId': new_id}, decode_response=True)
+    self.assertEqual(res2['response'].status_code, 200)
+    updated = res2['data']
+    self.assertNotEqual(updated, self.SAMPLE_WORKER)
+    self.assertEqual(updated, slightly_different_worker)
+
 
 
 """

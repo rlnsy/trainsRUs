@@ -113,7 +113,7 @@ def execute():
       lambda r: 
       obj_response(engine.handle_execute(r), status_code=SUCCESS_CREATE))
 
-@app.route(('/%s/worker' % VERSION), methods=["POST", "DELETE", "GET"])
+@app.route(('/%s/worker' % VERSION), methods=["POST", "DELETE", "GET", "PUT"])
 def worker():
     if request.method == "POST":
       return obj_request(
@@ -123,10 +123,14 @@ def worker():
       return obj_request(
         lambda r: 
         obj_response(engine.remove_worker(r), status_code=SUCCESS_OK))
-    else:
+    elif request.method == "GET":
       return obj_request(
         lambda r: 
         obj_response(engine.get_single_worker(r), status_code=SUCCESS_OK))
+    else:
+      return obj_request(
+        lambda r: 
+        obj_response(engine.update_worker(r), status_code=SUCCESS_CREATE))
     
 
 """
