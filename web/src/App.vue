@@ -1,28 +1,55 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Tabs @clicked="handleSwitch"/>
+    <span class="divider"></span>
+    {{scene}}
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue';
+import Tabs from './components/Tabs.vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
+    Tabs,
+  },
+  data() {
+    return {
+      scene: 0,
+    }
+  },
+  methods: {
+    handleSwitch(k){
+      this.scene = k
+    }
   },
 };
 </script>
 
 <style lang="scss">
+:root{
+  --trainBlue: #828EFF;
+}
+
+body{
+  margin: 0;
+  padding: 0;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Raleway', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  overflow: hidden;
+}
+
+.divider{
+  width: 7px;
+  height: 100%;
+  background-color: var(--trainBlue);
 }
 </style>
