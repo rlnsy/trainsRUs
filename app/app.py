@@ -81,6 +81,12 @@ def obj_request(k):
         'message': str(e)
       }, 
       status_code=CLIENT_NOT_FOUND)
+    except engine.HandlerNotImplemented as e:
+      return json_response(
+      {
+        'message': str(e)
+      }, 
+      status_code=SERVER_NOT_IMPLEMENTED)
     except Exception as e:
       logger.error("Engine error: %s" % e)
       return json_response(
@@ -133,7 +139,7 @@ def worker():
       json_response(engine.update_worker(r), status_code=SUCCESS_CREATE))
 
 @app.route(("/%s/segment/status" % VERSION), methods=["GET", "POST"])
-def segment():
+def segment_status():
   if request.method == "GET":
     return obj_request(
       lambda r: 
@@ -142,6 +148,17 @@ def segment():
     return obj_request(
       lambda r: 
       json_response(engine.update_segment(r), status_code=SUCCESS_CREATE))
+
+@app.route(("/%s/segment" % VERSION), methods=["GET", "POST"])
+def segment():
+  if request.method == "GET":
+    return obj_request(
+      lambda r: 
+      json_response(engine.get_segment_info(r), status_code=SUCCESS_OK))
+  elif request.method == "POST":
+    return obj_request(
+      lambda r: 
+      json_response(engine.create_segment(r), status_code=SUCCESS_CREATE))
       
 
 """

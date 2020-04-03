@@ -56,7 +56,7 @@ CREATE TABLE Station (
 
 CREATE TABLE Segment (
   id int PRIMARY KEY,
-  track_length char(50),
+  track_length int,
   condition char(50),
   start_station_name char(20) NOT NULL,
   end_station_name char(20) NOT NULL,

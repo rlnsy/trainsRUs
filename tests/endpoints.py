@@ -247,12 +247,11 @@ class TestEndpoints(unittest.TestCase):
   """
 
   SAMPLE_SEGMENT = {
-    "firstName": "John",
-    "lastName": "Smith",
-    "phoneNumber": "6475234213",
-    "role": "Train Conductor",
-    "availability": "M T Th F",
-    "workerType": "Train" 
+    'trackLengh': 100,
+    'condition': "Looking Good",
+    'role': "Train Conductor",
+    'startStation': "West",
+    'endStation': "North"
   }
 
   NUM_INIT_SEGMENTS = 5
@@ -288,6 +287,7 @@ class TestEndpoints(unittest.TestCase):
         'status': None
       })
 
+
   """ Update status """
 
   def test_update_status_1(self):
@@ -310,7 +310,7 @@ class TestEndpoints(unittest.TestCase):
         'segmentId': 1,
         'newStatus': "Broken"
       })
-    self.assertEqual(res['response'].status_code, 201)
+    self.assertEqual(res.status_code, 201)
     res = get(resource("/segment/status"), data={}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     results = res['data']
@@ -328,6 +328,60 @@ class TestEndpoints(unittest.TestCase):
         'newStatus': "Broken"
       })
     self.assertEqual(res.status_code, 404)
+
+  
+  """ Add segment """
+
+  def test_add_segment_1(self):
+    res = post(resource("/segment"), data={})
+    self.assertEqual(res.status_code, 400)
+    res = put(resource("/segment"),
+      data={
+        'trackLength': 3,
+        'condition': "Looking Good"
+      })
+    self.assertEqual(res.status_code, 400)
+
+  def test_add_segment_2(self):
+    res = post(resource("/segment"),
+      data={
+        'trackLengh': "100",
+        'condition': "Looking Good",
+        'role': "Train Conductor",
+        'startStation': "West",
+        'endStation': "North"
+    })
+    self.assertEqual(res.status_code, 400)
+
+  def test_add_segment_3(self):
+    res = post(resource("/segment"),
+      data=self.SAMPLE_SEGMENT, decode_response=True)
+    self.assertEqual(res['response'].status_code, 201)
+    self.assertIn('segmentId', res['data'])
+
+
+  """ Get segment info """
+
+  def test_segment_info_1(self):
+    res = get(resource("/segment"), data={})
+    self.assertEqual(res.status_code, 400)
+
+  def test_segment_info_2(self):
+    res = get(resource("/segment"), 
+      data={
+        'segmentId': 690400003
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_segment_info_3(self):
+    res = post(resource("/segment"),
+      data=self.SAMPLE_SEGMENT, decode_response=True)
+    sid = res['data']['segmentId']
+    res = get(resource("/segment"), 
+      data={
+        'segmentId': sid
+      }, decode_response=True)
+    self.assertEqual(res['data'], self.SAMPLE_SEGMENT)
 
 
 """

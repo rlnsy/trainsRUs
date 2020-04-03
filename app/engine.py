@@ -42,6 +42,13 @@ class NotFound(Exception):
   """
   pass
 
+class HandlerNotImplemented(Exception):
+  """
+  Thrown when a requested function is not
+  implemented
+  """
+  pass
+
 
 """
 Useful engine helpers
@@ -296,3 +303,26 @@ def get_segments(i):
       'status': trim_char_seq(t[1])
     })
   return data
+
+
+"""
+Create segment
+"""
+
+def create_segment(i):
+  raise HandlerNotImplemented("Create segment not implemented")
+
+"""
+Update Segment status
+"""
+
+def update_segment(i):
+  v = extract_fields(['segmentId', 'newStatus'], i)
+  raise HandlerNotImplemented("Update segment not implemented")
+
+"""
+Get Segment info
+"""
+
+def get_segment_info(i):
+  raise HandlerNotImplemented("Segment info not implemented")
