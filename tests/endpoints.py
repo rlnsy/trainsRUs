@@ -536,6 +536,47 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res.status_code, 404)
 
 
+  """ Get ticket info """
+
+  def test_ticket_info_1(self):
+    res = get(resource("/ticket/info"),
+      data={})
+    self.assertEqual(res.status_code, 400)
+    res = get(resource("/ticket/info"),
+      data={'tripId': 3})
+    self.assertEqual(res.status_code, 400)
+
+  def test_ticket_info_2(self):
+    res = get(resource("/ticket/info"),
+      data={
+        'tripId': 2, 
+        'seatNumber': 3
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_ticket_info_3(self):
+    res = get(resource("/ticket/info"),
+      data={
+        'tripId': 1, 
+        'seatNumber': 3
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data']['seatNumber'], 3)
+    self.assertEqual(res['data']['passenger'],
+      {
+        'passengerId': 1,
+        'name': "John Smity",
+        'phoneNumber': "(124)-333-3214",
+        'email': "uad@gmail.com"
+      })
+    self.assertEqual(res['data']['class'],
+      {
+        'classType': 'Business',
+        'refundable': True,
+        'priorityBoarding': True,
+        'freeFood': True
+      })
+
 
 """
 Runtime procedure

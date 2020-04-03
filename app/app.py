@@ -174,6 +174,12 @@ def shiftt():
     return obj_request(
       lambda r: 
       json_response(engine.remove_shift(r), status_code=SUCCESS_OK))
+
+@app.route(("/%s/ticket/info" % VERSION_1), methods=["GET"])
+def ticket_info():
+  return obj_request(
+      lambda r: 
+      json_response(engine.get_ticket_info(r), status_code=SUCCESS_OK))
       
 
 """

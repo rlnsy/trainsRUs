@@ -96,9 +96,13 @@ def extract_fields(keys, input):
       raise MissingInput(msg)
   return vals
 
-def trim_char_seq(str):
-  return str.rstrip(' ') if (str is not None) else None
-
+def trim_char_seq(s):
+  if s is None:
+    return None
+  elif type(s) is not str:
+    logger.error("String trim received %s" % str(s))
+    raise Exception("Invalid type for char strip: %s" % str(type(s)))
+  return s.rstrip(' ')
 
 
 """
@@ -486,4 +490,71 @@ def remove_shift(i):
   return {
     'message': "Shift deleted"
   }
+
+
+"""
+Get ticket info
+"""
+
+def get_passenger_info(i):
+  v = extract_fields(['passengerId'], i)
+  if type(v['passengerId']) is not int:
+    raise InputDomainError()
+  search = dbw.execute(
+    """
+    SELECT * FROM Passenger WHERE id = %d;
+    """ % v['passengerId'])
+  if len(search) == 0:
+    raise NotFound("Passenger %d does not exist" % v['passengerId'])
+  else:
+    match = search[0]
+    return {
+      'passengerId': v['passengerId'],
+      'name': ("%s %s" % (trim_char_seq(match[1]), trim_char_seq(match[2]))),
+      'phoneNumber': trim_char_seq(match[3]),
+      'email': trim_char_seq(match[4])
+    }
+
+def get_class_info(i):
+  v = extract_fields(['classType'], i)
+  search = dbw.execute(
+    """
+    SELECT * FROM Class WHERE type = '%s';
+    """ % v['classType'])
+  if len(search) == 0:
+    raise NotFound("Class %s does not exist" % v['classType'])
+  else:
+    match = search[0]
+    return {
+      'classType': trim_char_seq(match[0]),
+      'refundable': match[1],
+      'priorityBoarding': match[2],
+      'freeFood': match[3]
+    }
+
+def get_ticket_info(i):
+  v = extract_fields([
+    'tripId', 'seatNumber'
+  ], i)
+  search = dbw.execute(
+    """
+    SELECT * FROM Ticket
+    WHERE 
+      seat_number = %d
+      AND
+      trip_id = %d
+    """ % (v['seatNumber'], v['tripId']))
+  if len(search) == 0:
+    raise NotFound("Requested ticket does not exist")
+  else:
+    match = search[0]
+    pid = match[1]
+    ctype = match[2]
+    passenger = get_passenger_info({'passengerId': pid})
+    ticketclass = get_class_info({'classType': ctype})
+    return {
+      'seatNumber': match[0],
+      'passenger': passenger,
+      'class': ticketclass
+    }
 
