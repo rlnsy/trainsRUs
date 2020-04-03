@@ -132,12 +132,17 @@ def worker():
       lambda r: 
       json_response(engine.update_worker(r), status_code=SUCCESS_CREATE))
 
-@app.route(("/%s/segment" % VERSION), methods=["GET"])
+@app.route(("/%s/segment/status" % VERSION), methods=["GET", "POST"])
 def segment():
-  return obj_request(
-    lambda r: 
-    json_response(engine.get_segments(r), status_code=SUCCESS_OK))
-    
+  if request.method == "GET":
+    return obj_request(
+      lambda r: 
+      json_response(engine.get_segments(r), status_code=SUCCESS_OK))
+  elif request.method == "POST":
+    return obj_request(
+      lambda r: 
+      json_response(engine.update_segment(r), status_code=SUCCESS_CREATE))
+      
 
 """
 Runtime

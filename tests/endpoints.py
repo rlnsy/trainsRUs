@@ -246,12 +246,21 @@ class TestEndpoints(unittest.TestCase):
   Maintenance worker endpoints
   """
 
+  SAMPLE_SEGMENT = {
+    "firstName": "John",
+    "lastName": "Smith",
+    "phoneNumber": "6475234213",
+    "role": "Train Conductor",
+    "availability": "M T Th F",
+    "workerType": "Train" 
+  }
+
   NUM_INIT_SEGMENTS = 5
 
   """ Get segment status """
 
   def test_segment_status_1(self):
-    res = get(resource("/segment"), data={}, decode_response=True)
+    res = get(resource("/segment/status"), data={}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     results = res['data']
     self.assertEqual(len(results), self.NUM_INIT_SEGMENTS)
@@ -267,7 +276,7 @@ class TestEndpoints(unittest.TestCase):
       })
 
   def test_segment_status_2(self):
-    res = get(resource("/segment"), data={
+    res = get(resource("/segment/status"), data={
       'workerId': 6
     }, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
@@ -278,6 +287,47 @@ class TestEndpoints(unittest.TestCase):
         'segmentId': 2,
         'status': None
       })
+
+  """ Update status """
+
+  def test_update_status_1(self):
+    res = put(resource("/segment/status"), data={})
+    self.assertEqual(res.status_code, 400)
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 3
+      })
+    self.assertEqual(res.status_code, 400)
+    res = put(resource("/segment/status"),
+      data={
+        'newStatus': "Broken"
+      })
+    self.assertEqual(res.status_code, 400)
+
+  def test_update_status_3(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 1,
+        'newStatus': "Broken"
+      })
+    self.assertEqual(res['response'].status_code, 201)
+    res = get(resource("/segment/status"), data={}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    results = res['data']
+    self.assertEqual(len(results), self.NUM_INIT_SEGMENTS)
+    self.assertEqual(results[0],
+      {
+        'segmentId': 1,
+        'status': "Broken"
+      })
+
+  def test_update_status_4(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 9999,
+        'newStatus': "Broken"
+      })
+    self.assertEqual(res.status_code, 404)
 
 
 """
