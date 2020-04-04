@@ -1,7 +1,11 @@
 <template>
   <div>
     <b-form>
-      <b-alert v-model="showDismissibleAlert" :variant="alertType" dismissible>
+      <b-alert
+        v-model="showDismissibleAlert"
+        :variant="alertType"
+        dismissible
+      >
         {{ alertText }}
       </b-alert>
       <label for="input-1">Segment ID</label>
