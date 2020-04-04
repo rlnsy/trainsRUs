@@ -5,6 +5,7 @@ Defines the forward-facing API for the
 
 
 from flask import Flask, request, make_response
+from flask_cors import CORS
 import json
 from utils import ApplicationLogger
 from engine import (
@@ -15,7 +16,6 @@ from engine import (
   NotFound, 
   HandlerNotImplemented
 )
-
 
 """
 All of the HTTP status codes we could ever need
@@ -35,6 +35,7 @@ SERVER_UNAVAILABLE = 503
 Set up application context
 """
 app = Flask("Trains 'R' Us")
+CORS(app)
 logger = ApplicationLogger(demo_mode=True)
 engine = Engine(logger)
 

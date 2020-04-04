@@ -1,7 +1,11 @@
 <template>
   <div>
-    <b-alert v-model="showDismissibleAlert" :variant="alertType" dismissible>
-    {{ alertText }}
+    <b-alert
+      v-model="showDismissibleAlert"
+      :variant="alertType"
+      dismissible
+    >
+      {{ alertText }}
     </b-alert>
     <b-form>
       <h5>Keep rows where condition is:</h5>

@@ -2,7 +2,11 @@
   <div class="form-input-output">
     <label for="input-1">Worker ID</label>
     <b-form inline>
-      <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>
+      <b-alert
+        v-model="showDismissibleAlert"
+        variant="danger"
+        dismissible
+      >
         {{ alertText }}
       </b-alert>
       <b-form-input
@@ -17,8 +21,11 @@
         Submit
       </b-button>
     </b-form>
-    <b-card class="mt-3" header="Worker Info">
-        <pre class="m-0">{{ workerInfo }}</pre>
+    <b-card
+      class="mt-3"
+      header="Worker Info"
+    >
+      <pre class="m-0">{{ workerInfo }}</pre>
     </b-card>
   </div>
 </template>

@@ -55,11 +55,12 @@
         href="#"
         v-b-modal.modal-1
         @click="currentFormHeader='Delete Worker'; formIndex = 1"
-        >Delete Worker</a>
+      >Delete Worker</a>
       <a
         href="#"
         v-b-modal.modal-1
-        @click="currentFormHeader='Get Worker'; formIndex = 2">
+        @click="currentFormHeader='Get Worker'; formIndex = 2"
+      >
         Get Worker</a>
     </div>
   </div>

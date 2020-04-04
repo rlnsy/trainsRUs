@@ -47,8 +47,10 @@ export default {
 .tabs {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   background-color: #414141;
+
+  overflow: hidden;
 
   > button {
       font-size: 110%;

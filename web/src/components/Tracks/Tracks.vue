@@ -5,8 +5,11 @@
       :title="this.currentFormHeader"
       hide-footer
     >
-    <update-segment-form v-if="formIndex === 0" />
-    <filter-table-form v-if="formIndex === 1" @submit="handleFilter"/>
+      <update-segment-form v-if="formIndex === 0" />
+      <filter-table-form
+        v-if="formIndex === 1"
+        @submit="handleFilter"
+      />
     </b-modal>
     <h2>Track Segment Maintenance</h2>
     <div class="l-row">
@@ -34,8 +37,10 @@
       </div>
       <span />
       <div>
-        <p class="stat"
-            style="color: #FF8989;">
+        <p
+          class="stat"
+          style="color: #FF8989;"
+        >
           {{ summaryStats.criticalCondition }}
         </p>
         <p>Critical Condition</p>
@@ -62,7 +67,7 @@
         href="#"
         v-b-modal.modal-2
         @click="currentFormHeader='Filter Table By Condition'; formIndex = 1"
-        >Filter Table By Condition</a>
+      >Filter Table By Condition</a>
     </div>
   </div>
 </template>
