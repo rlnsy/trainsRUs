@@ -149,6 +149,12 @@ def segment_status():
       lambda r: 
       json_response(engine.update_segment(r), status_code=SUCCESS_CREATE))
 
+@app.route(("/%s/segment/status/count" % VERSION_1), methods=["GET"])
+def segment_status_count():
+  return obj_request(
+      lambda r: 
+      json_response(engine.get_segment_status_count(r), status_code=SUCCESS_OK))
+
 @app.route(("/%s/segment" % VERSION_1), methods=["GET", "POST"])
 def segment():
   if request.method == "GET":

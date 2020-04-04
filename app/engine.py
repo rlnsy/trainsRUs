@@ -359,6 +359,33 @@ def get_segment_info(i):
     'endStation': trim_char_seq(match[4])
   }
 
+def get_segment_status_count(i):
+  v = extract_fields(['status'], i)
+  query = None
+  if v['status'] is None:
+    query = """
+    SELECT 
+    COUNT(*)
+    FROM
+        Segment
+    WHERE
+        condition IS NULL;
+    """
+  else:
+    query = """
+    SELECT 
+    COUNT(*)
+    FROM
+        Segment
+    WHERE
+        condition = '%s';
+    """ % v['status']
+  result = dbw.execute(query)
+  return {
+    'status': v['status'],
+    'numSegments': result[0][0]
+  }
+
 
 """
 Update Segment status

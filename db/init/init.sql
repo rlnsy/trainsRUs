@@ -580,7 +580,7 @@ VALUES
 INSERT INTO
   Segment
 VALUES
-  (1, 100, NULL, 'East', 'West');
+  (1, 100, 'Working', 'East', 'West');
 
 INSERT INTO
   Segment

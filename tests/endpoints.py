@@ -263,7 +263,7 @@ class TestEndpoints(unittest.TestCase):
     results = res['data']
     self.assertIn({
         'segmentId': 1,
-        'status': None
+        'status': "Working"
       }, results)
     self.assertIn({
         'segmentId': 3,
@@ -283,7 +283,38 @@ class TestEndpoints(unittest.TestCase):
         'status': None
       })
 
+
+  """ Get segment status count """
+
+  def test_segment_status_count_1(self):
+    res = get(resource("/segment/status/count"),
+      data={})
+    self.assertEqual(res.status_code, 400)
+    res = get(resource("/segment/status/count"),
+      data={'segmentId': 3})
+    self.assertEqual(res.status_code, 400)
+
+  def test_segment_status_count_2(self):
+    target_status = "Not a valid status"
+    res = get(resource("/segment/status/count"),
+      data={
+        'status': target_status
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data']['status'], target_status)
+    self.assertEqual(res['data']['numSegments'], 0)
+
+  def test_segment_status_count_3(self):
+    target_status = None
+    res = get(resource("/segment/status/count"),
+      data={
+        'status': target_status
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data']['status'], target_status)
+    self.assertEqual(res['data']['numSegments'], 3)
   
+
   """ Add segment """
 
   def test_add_segment_1(self):
