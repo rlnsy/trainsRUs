@@ -4,6 +4,7 @@
     <span class="divider" />
     <Workers v-if="scene === 0" />
     <Tracks v-if="scene === 1" />
+    <Train v-if="scene === 3" />
   </div>
 </template>
 
@@ -11,6 +12,7 @@
 import Tabs from './components/Tabs.vue';
 import Workers from './components/Worker/Workers.vue';
 import Tracks from './components/Tracks/Tracks.vue';
+import Train from './components/Train/Train.vue';
 
 export default {
   name: 'App',
@@ -18,6 +20,7 @@ export default {
     Tabs,
     Workers,
     Tracks,
+    Train,
   },
   data() {
     return {
@@ -56,12 +59,12 @@ h1, h2, h3, h4 {
   height: 100vh;
   width: 100vw;
   display: flex;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 .divider{
   width: 7px;
-  height: 100%;
+  height: 100vh;
   background-color: var(--trainBlue);
 }
 </style>
