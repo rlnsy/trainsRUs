@@ -40,6 +40,42 @@ def json_response(o, status_code=SUCCESS_OK):
   res.headers['Content-Type'] = 'application/json'
   return res
 
+def compute_request(k):
+  try:
+      return k()
+  except (
+    engine.MissingInput, 
+    engine.InputDomainError) as e:
+    return json_response(
+    {
+      'message': str(e)
+    }, 
+    status_code=CLIENT_BAD_REQUEST)
+  except engine.NotAllowed as e:
+    return json_response(
+    {
+      'message': str(e)
+    }, 
+    status_code=CLIENT_FORBIDDEN)
+  except engine.NotFound as e:
+    return json_response(
+    {
+      'message': str(e)
+    }, 
+    status_code=CLIENT_NOT_FOUND)
+  except engine.HandlerNotImplemented as e:
+    return json_response(
+    {
+      'message': str(e)
+    }, 
+    status_code=SERVER_NOT_IMPLEMENTED)
+  except Exception as e:
+    logger.error("Engine error: %s" % e)
+    return json_response(
+    {
+      'message': "An internal engine error occurred"
+    }, 
+    status_code=SERVER_INTERNAL_ERROR)
 
 def obj_request(k):
   """
@@ -59,41 +95,7 @@ def obj_request(k):
       status_code=CLIENT_BAD_REQUEST)
   else:
     logger.info("Request: %s" % json.dumps(req))
-    try:
-      return k(req)
-    except (
-      engine.MissingInput, 
-      engine.InputDomainError) as e:
-      return json_response(
-      {
-        'message': str(e)
-      }, 
-      status_code=CLIENT_BAD_REQUEST)
-    except engine.NotAllowed as e:
-      return json_response(
-      {
-        'message': str(e)
-      }, 
-      status_code=CLIENT_FORBIDDEN)
-    except engine.NotFound as e:
-      return json_response(
-      {
-        'message': str(e)
-      }, 
-      status_code=CLIENT_NOT_FOUND)
-    except engine.HandlerNotImplemented as e:
-      return json_response(
-      {
-        'message': str(e)
-      }, 
-      status_code=SERVER_NOT_IMPLEMENTED)
-    except Exception as e:
-      logger.error("Engine error: %s" % e)
-      return json_response(
-      {
-        'message': "An internal engine error occurred"
-      }, 
-      status_code=SERVER_INTERNAL_ERROR)
+    return compute_request(lambda: k(req))
 
 
 """
@@ -201,6 +203,10 @@ def station():
     return obj_request(
       lambda r: 
       json_response(engine.create_station(r), status_code=SUCCESS_CREATE))
+
+@app.route(("/%s/stat/trip/length" % VERSION_1), methods=["GET"])
+def avg_trip_length_stat():
+  return compute_request(lambda: json_response(engine.get_avg_trip_length(), status_code=SUCCESS_OK))
       
 
 """

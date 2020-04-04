@@ -609,6 +609,20 @@ class TestEndpoints(unittest.TestCase):
       })
 
 
+  """
+  Statistics endpoints
+  """
+
+  def test_get_avg_length_1(self):
+    res = post(resource("/stat/trip/length"))
+    self.assertEqual(res.status_code, 405)
+
+  def test_get_avg_length_2(self):
+    res = get(resource("/stat/trip/length"), decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data']['avgTripLength'], 1.0)
+
+
 """
 Runtime procedure
 """

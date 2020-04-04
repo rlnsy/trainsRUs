@@ -599,3 +599,26 @@ def get_station(i):
 def update_station(i):
   raise HandlerNotImplemented()
 
+
+"""
+Stats stuff
+"""
+
+def get_avg_trip_length():
+  query = """
+          SELECT AVG (Count.num_trip_segments) 
+          FROM 
+            (SELECT COUNT(*) AS num_trip_segments
+              FROM 
+                Trip_Leg 
+                INNER JOIN 
+                Segment
+                ON
+                Trip_Leg.segment_id = Segment.id 
+              GROUP BY trip_id) AS Count
+          """
+  result = dbw.execute(query)
+  return {
+    'avgTripLength': float(result[0][0])
+  }
+
