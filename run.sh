@@ -9,7 +9,7 @@ BACKEND_DOWN="backend-down"
 FRONTEND_DEBUG="frontend"
 
 print_usage() {
-  echo "USAGE: cdkrunner [ $STACK_UP | $STACK_DOWN | | $BACKEND_UP | $BACKEND_DOWN | $FRONTEND_DEBUG ]"
+  echo "USAGE: ./run.sh [ $STACK_UP | $STACK_DOWN | | $BACKEND_UP | $BACKEND_DOWN | $FRONTEND_DEBUG ]"
   echo "$STACK_UP: Run full stack container"
   echo "$STACK_DOWN: Tear down full stack container"
   echo "$BACKEND_UP: Run backend stack with tests"
