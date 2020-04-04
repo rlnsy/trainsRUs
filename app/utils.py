@@ -28,3 +28,11 @@ class ApplicationLogger:
   def demo(self, msg):
     if self._demo:
       self._displayln_(" [DEMO] %s" % msg)
+
+
+def trim_char_seq(s):
+    if s is None:
+      return None
+    elif type(s) is not str:
+      raise Exception("Invalid type for char strip: %s" % str(type(s)))
+    return s.rstrip(' ')

@@ -1,5 +1,6 @@
 import psycopg2
 import time
+from utils import trim_char_seq as trim
 
 
 """
@@ -59,6 +60,40 @@ class PSQLWrapper:
     Logger function
     """
     l("[DBWRAPPER] %s" % msg)
+
+  def _format_results_(self, dbresult):
+    """
+    Convert DB driver results into readable string results
+    """
+    if type(dbresult) is tuple:
+      data = ""
+      for i in range(0, len(dbresult)):
+        val = dbresult[i]
+        if type(val) is str:
+          data += "'%s' " % trim(val)
+        elif type(val) is bool:
+          data += "%s " % ("true" if val else "false")
+        elif val is None:
+          data += "NULL "
+        else:
+          data += "%s " % val
+      return data
+    elif type(dbresult is list):
+      if len(dbresult) == 0:
+        return """
+      No results
+        """
+      else:
+        results = ""
+        for i,r in enumerate(dbresult):
+          if i > 0:
+            results += "      "
+          results += "%d. (%s)\n" % (i + 1, self._format_results_(r))
+        return """
+      %s
+        """ % results
+    else:
+      return str(dbresult)
   
   def connect(self):
     """
@@ -106,10 +141,12 @@ class PSQLWrapper:
         transaction.commit()
         try:
           result = cursor.fetchall()
-          return result
         except Exception:
           # command is essentially void return type e.g. INSERT
+          self._log_(self._logger_.demo, "Results: N/A")
           return None
+        self._log_(self._logger_.demo, "Results:\n%s" % self._format_results_(result))
+        return result
       except Exception as de:
         self._log_(self._logger_.warn, "Execute error: %s" % str(de))
         raise DBExecuteError(de)

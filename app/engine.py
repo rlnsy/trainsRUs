@@ -1,5 +1,5 @@
 from db import PSQLWrapper
-from utils import ApplicationLogger
+from utils import ApplicationLogger, trim_char_seq as trim
 
 
 EXECUTE_TOKEN = "61YYZlA!QkeZ3V7NtY9OPDvN$u7N^E&t"
@@ -94,14 +94,6 @@ class Engine:
         self._logger.info(msg)
         raise MissingInput(msg)
     return vals
-
-  def trim_char_seq(self, s):
-    if s is None:
-      return None
-    elif type(s) is not str:
-      self._logger.error("String trim received %s" % str(s))
-      raise Exception("Invalid type for char strip: %s" % str(type(s)))
-    return s.rstrip(' ')
 
 
   """
@@ -230,11 +222,11 @@ class Engine:
         raise NotFound(
       "Worker %d is not of type %s" % (v['workerId'], target_worker_type))
       return {
-        'firstName': self.trim_char_seq(match[1]),
-        'lastName': self.trim_char_seq(match[2]),
-        'phoneNumber': self.trim_char_seq(match[3]),
-        'role': self.trim_char_seq(match[4]),
-        'availability': self.trim_char_seq(match[5]),
+        'firstName': trim(match[1]),
+        'lastName': trim(match[2]),
+        'phoneNumber': trim(match[3]),
+        'role': trim(match[4]),
+        'availability': trim(match[5]),
         'workerType': worker_type
       }
 
@@ -293,7 +285,9 @@ class Engine:
     data = []
     query = None
     if wid is None:
-      query = "SELECT id, condition FROM Segment;"
+      query = """
+      SELECT id, condition FROM Segment;
+      """
     else:
       query = ("""
       SELECT
@@ -307,7 +301,7 @@ class Engine:
     for t in self._dbw.execute(query):
       data.append({
         'segmentId': t[0],
-        'status': self.trim_char_seq(t[1])
+        'status': trim(t[1])
       })
     return data
 
@@ -353,9 +347,9 @@ class Engine:
       match = search[0]
       return {
       'trackLength': match[1],
-      'condition': self.trim_char_seq(match[2]),
-      'startStation': self.trim_char_seq(match[3]),
-      'endStation': self.trim_char_seq(match[4])
+      'condition': trim(match[2]),
+      'startStation': trim(match[3]),
+      'endStation': trim(match[4])
     }
 
   def get_segment_status_count(self, i):
@@ -419,7 +413,7 @@ class Engine:
         'tripId': r[1],
         'segmentId': r[2],
         'numHours': r[3],
-        'startTime': self.trim_char_seq(r[4])
+        'startTime': trim(r[4])
       })
     return results
 
@@ -441,8 +435,8 @@ class Engine:
     else:
       match = search[0]
       return {
-      'departureTime': self.trim_char_seq(match[1]),
-      'arrivalTime': self.trim_char_seq(match[2])
+      'departureTime': trim(match[1]),
+      'arrivalTime': trim(match[2])
     }
 
   def schedule_shift(self, i):
@@ -536,9 +530,9 @@ class Engine:
       match = search[0]
       return {
         'passengerId': v['passengerId'],
-        'name': ("%s %s" % (self.trim_char_seq(match[1]), self.trim_char_seq(match[2]))),
-        'phoneNumber': self.trim_char_seq(match[3]),
-        'email': self.trim_char_seq(match[4])
+        'name': ("%s %s" % (trim(match[1]), trim(match[2]))),
+        'phoneNumber': trim(match[3]),
+        'email': trim(match[4])
       }
 
   def get_class_info(self, i):
@@ -552,7 +546,7 @@ class Engine:
     else:
       match = search[0]
       return {
-        'classType': self.trim_char_seq(match[0]),
+        'classType': trim(match[0]),
         'refundable': match[1],
         'priorityBoarding': match[2],
         'freeFood': match[3]
@@ -605,16 +599,16 @@ class Engine:
 
   def get_avg_trip_length(self):
     query = """
-            SELECT AVG (Count.num_trip_segments) 
-            FROM 
-              (SELECT COUNT(*) AS num_trip_segments
-                FROM 
-                  Trip_Leg 
-                  INNER JOIN 
-                  Segment
-                  ON
-                  Trip_Leg.segment_id = Segment.id 
-                GROUP BY trip_id) AS Count
+      SELECT AVG (Count.num_trip_segments) 
+      FROM 
+        (SELECT COUNT(*) AS num_trip_segments
+          FROM 
+            Trip_Leg 
+            INNER JOIN 
+            Segment
+            ON
+            Trip_Leg.segment_id = Segment.id 
+          GROUP BY trip_id) AS Count
             """
     result = self._dbw.execute(query)
     return {
