@@ -1,24 +1,19 @@
 version: '3'
 services:
   database:
-    build: db
+    build: ../db
     restart: always
     ports:
       - "5432"
   application:
-    build: app
+    build: ../app
     ports:
       - "5000:6000"
     depends_on:
       - "database"
     command: ["python", "app.py"]
-  tests:
-    build: tests
-    depends_on:
-      - "application"
-    command: ["python", "-m", "unittest", "endpoints.py"]
   frontend:
-    build: web
+    build: ../web
     ports:
       - "8080:8080"
     depends_on:
