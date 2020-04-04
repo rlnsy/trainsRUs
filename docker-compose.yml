@@ -6,7 +6,7 @@ services:
     ports:
       - "5432"
   application:
-    build: .
+    build: app
     ports:
       - "5000:6000"
     depends_on:
@@ -17,3 +17,10 @@ services:
     depends_on:
       - "application"
     command: ["python", "-m", "unittest", "endpoints.py"]
+  frontend:
+    build: web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "application"
+    command: ["yarn", "serve"]

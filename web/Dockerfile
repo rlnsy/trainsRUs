@@ -1,0 +1,17 @@
+FROM node:11 as build-deps
+RUN npm install -g yarn
+ADD yarn.lock /yarn.lock
+WORKDIR /frontend
+ADD package.json /package.json
+COPY package.json yarn.lock ./
+RUN yarn install
+ENV NODE_PATH=/node_modules
+COPY . ./
+ENV PATH=$PATH:/node_modules/.bin
+
+# RUN yarn build
+# FROM nginx:1.15.3-alpine
+# WORKDIR /app
+# COPY --from=build-deps /usr/src/app/build /usr/share/nginx/html
+# ADD . /app
+# EXPOSE 80
