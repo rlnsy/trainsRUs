@@ -3,18 +3,21 @@
     <Tabs @clicked="handleSwitch" />
     <span class="divider" />
     <Workers v-if="scene === 0" />
+    <Tracks v-if="scene === 1" />
   </div>
 </template>
 
 <script>
 import Tabs from './components/Tabs.vue';
 import Workers from './components/Worker/Workers.vue';
+import Tracks from './components/Tracks/Tracks.vue';
 
 export default {
   name: 'App',
   components: {
     Tabs,
     Workers,
+    Tracks,
   },
   data() {
     return {

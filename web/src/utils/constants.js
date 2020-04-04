@@ -5,3 +5,9 @@ export const Departments = {
     TRACK: 'Maintenance',
     TRAIN: 'Train'
 }
+
+export const Conditions = {
+    GOOD: 'Normal',
+    REPAIRS: 'Needs Repairs',
+    CRITICAL: 'Critical',
+}

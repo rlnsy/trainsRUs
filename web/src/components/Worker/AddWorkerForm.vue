@@ -1,6 +1,9 @@
 <template>
   <div>
     <b-form>
+      <b-alert v-model="showDismissibleAlert" :variant="alertType" dismissible>
+        {{ alertText }}
+      </b-alert>
       <label for="input-1">First Name</label>
       <b-form-input
         id="input-1"
@@ -18,6 +21,7 @@
         id="input-3"
         v-model="form.phoneNumber"
         :state="inputValidation.phoneNumber"
+        type="number"
       />
       <label for="input-4">Job Title</label>
       <b-form-input
@@ -94,6 +98,9 @@ export default {
           checked: null
         },
         departments: [{ text: 'Select One', value: null }].concat(Object.values(Departments)),
+        showDismissibleAlert: false,
+        alertText: '',
+        alertType: ''
       }
   },
   methods: {
@@ -108,7 +115,14 @@ export default {
                 type: this.form.type,
                 availabilty: this.form.checked.reduce(reducer, "")
             }
+
+            // TODO: Send postForm to creation endpoint and verify success
             console.log(JSON.stringify(postForm))
+
+            
+            this.alertText = "Worker Created"
+            this.alertType = "success"
+            this.showDismissibleAlert = true;
 
             this.form = {
                 firstName: '',
@@ -118,9 +132,14 @@ export default {
                 type: '',
                 checked: []
             }
-
-            this.$emit('submit')
-        }        
+        } else {
+            this.alertText = "The following fields have issues: "
+            this.alertType = "danger"
+            for(var input in this.inputValidation){
+                this.inputValidation[input] === false ? this.alertText = this.alertText + ' ' + input : ''
+            }
+            this.showDismissibleAlert = true;
+        }
       },
       validateForm() {
           var valid = true
