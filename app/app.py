@@ -8,7 +8,7 @@ from flask import Flask, request, make_response
 import json
 from utils import ApplicationLogger
 import engine
-
+from flask_cors import CORS
 
 """
 All of the HTTP status codes we could ever need
@@ -103,7 +103,7 @@ Set up application context
 """
 app = Flask("Trains 'R' Us")
 logger = ApplicationLogger()
-
+CORS(app)
 
 """
 Routes
