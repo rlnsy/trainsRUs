@@ -1,15 +1,14 @@
 <template>
-  <div class="worker">
+  <div class="track">
     <b-modal
-      id="modal-1"
+      id="modal-2"
       :title="this.currentFormHeader"
       hide-footer
     >
-      <add-worker-form v-if="formIndex === 0" />
-      <delete-worker-form v-if="formIndex === 1" />
-      <get-worker-form v-if="formIndex === 2" />
+    <update-segment-form v-if="formIndex === 0" />
+    <filter-table-form v-if="formIndex === 1" @submit="handleFilter"/>
     </b-modal>
-    <h2>Manage All Workers</h2>
+    <h2>Track Segment Maintenance</h2>
     <div class="l-row">
       <h4>Summary Stats</h4>
       <button @click="loadSummary()">
@@ -19,89 +18,97 @@
     <div class="summary">
       <div>
         <p class="stat">
-          {{ summaryStats.totalWorkers }}
+          {{ summaryStats.totalTracks }}
         </p>
-        <p>Total Workers</p>
+        <p>Track Segments</p>
       </div>
       <span />
       <div>
         <p
           class="stat"
-          style="color: var(--trainAccentBlue);"
+          style="color: #FFBA7C;"
         >
-          {{ summaryStats.workingToday }}
+          {{ summaryStats.needRepairs }}
         </p>
-        <p>Working Today</p>
+        <p>Need Repairs</p>
+      </div>
+      <span />
+      <div>
+        <p class="stat"
+            style="color: #FF8989;">
+          {{ summaryStats.criticalCondition }}
+        </p>
+        <p>Critical Condition</p>
       </div>
     </div>
     <div
       class="l-row"
       style="margin-bottom: 20px;"
     >
-      <h4>All Workers</h4>
+      <h4>All Tracks</h4>
       <button @click="loadTable()">
         Load
       </button>
     </div>
-    <b-table :items="this.workers" />
+    <b-table :items="this.tracks" />
     <div class="actions">
       <h4>Actions</h4>
       <a
         href="#"
-        v-b-modal.modal-1
-        @click="currentFormHeader='Add New Worker'; formIndex = 0"
-      >Add New Worker</a>
+        v-b-modal.modal-2
+        @click="currentFormHeader='Update Track Segment'; formIndex = 0"
+      >Update Track Segment</a>
       <a 
         href="#"
-        v-b-modal.modal-1
-        @click="currentFormHeader='Delete Worker'; formIndex = 1"
-        >Delete Worker</a>
-      <a
-        href="#"
-        v-b-modal.modal-1
-        @click="currentFormHeader='Get Worker'; formIndex = 2">
-        Get Worker</a>
+        v-b-modal.modal-2
+        @click="currentFormHeader='Filter Table By Condition'; formIndex = 1"
+        >Filter Table By Condition</a>
     </div>
   </div>
 </template>
 
 <script>
-import workerCalls from '../../utils/workerCalls.js'
-import AddWorkerForm from './AddWorkerForm.vue'
-import DeleteWorkerForm from './DeleteWorkerForm.vue'
-import GetWorkerForm from './GetWorkerForm.vue'
+import trackCalls from '../../utils/trackCalls.js'
+import UpdateSegmentForm from './UpdateSegmentForm.vue'
+import FilterTableForm from './FilterTableForm.vue'
 
 export default {
-  name: 'Workers',
+  name: 'Tracks',
   components: {
-      AddWorkerForm,
-      DeleteWorkerForm,
-      GetWorkerForm,
+      UpdateSegmentForm,
+      FilterTableForm,
   },
   data() {
     return {
       summaryStats: {
-        totalWorkers: 0,
-        workingToday: 0,
+        totalTracks: 0,
+        needRepairs: 0,
+        criticalCondition: 0,
       },
-      workers: [],
+      tracks: [],
       currentFormHeader: '',
       formIndex: 0,
+      tableCondition: '',
     }
   },
   methods: {
       async loadSummary() {
-          this.summaryStats = await workerCalls.getSummary()
+          this.summaryStats = await trackCalls.getSummary()
       },
       async loadTable() {
-          this.workers = await workerCalls.getAllWorkers()
-      }
+          this.tracks =  await trackCalls.getAllTracks(this.tableCondition)
+      },
+      async handleFilter(evt) {
+          this.tableCondition = evt
+          await this.loadTable()
+          this.$bvModal.hide('modal-2')
+      },
   },
 };
 </script>
 
 <style scoped lang="scss">
-.worker{
+.track{
     position: relative;
     width: 100%;
     height: 100%;

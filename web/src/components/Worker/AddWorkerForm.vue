@@ -21,6 +21,7 @@
         id="input-3"
         v-model="form.phoneNumber"
         :state="inputValidation.phoneNumber"
+        type="number"
       />
       <label for="input-4">Job Title</label>
       <b-form-input
