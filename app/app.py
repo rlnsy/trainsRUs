@@ -7,7 +7,14 @@ Defines the forward-facing API for the
 from flask import Flask, request, make_response
 import json
 from utils import ApplicationLogger
-import engine
+from engine import (
+  Engine,
+  MissingInput,
+  InputDomainError, 
+  NotAllowed, 
+  NotFound, 
+  HandlerNotImplemented
+)
 
 
 """
@@ -22,6 +29,14 @@ CLIENT_BAD_METHOD = 405
 SERVER_INTERNAL_ERROR = 500
 SERVER_NOT_IMPLEMENTED = 501
 SERVER_UNAVAILABLE = 503
+
+
+"""
+Set up application context
+"""
+app = Flask("Trains 'R' Us")
+logger = ApplicationLogger(demo_mode=True)
+engine = Engine(logger)
 
 
 """
@@ -44,26 +59,26 @@ def compute_request(k):
   try:
       return k()
   except (
-    engine.MissingInput, 
-    engine.InputDomainError) as e:
+    MissingInput, 
+    InputDomainError) as e:
     return json_response(
     {
       'message': str(e)
     }, 
     status_code=CLIENT_BAD_REQUEST)
-  except engine.NotAllowed as e:
+  except NotAllowed as e:
     return json_response(
     {
       'message': str(e)
     }, 
     status_code=CLIENT_FORBIDDEN)
-  except engine.NotFound as e:
+  except NotFound as e:
     return json_response(
     {
       'message': str(e)
     }, 
     status_code=CLIENT_NOT_FOUND)
-  except engine.HandlerNotImplemented as e:
+  except HandlerNotImplemented as e:
     return json_response(
     {
       'message': str(e)
@@ -96,13 +111,6 @@ def obj_request(k):
   else:
     logger.info("Request: %s" % json.dumps(req))
     return compute_request(lambda: k(req))
-
-
-"""
-Set up application context
-"""
-app = Flask("Trains 'R' Us")
-logger = ApplicationLogger()
 
 
 """
@@ -214,7 +222,6 @@ Runtime
 """
 if __name__ == "__main__":
     try:
-      engine.init_db_wrapper()
       app.run(host="0.0.0.0", port=6000) # TODO change to env variable
     except Exception as e:
       logger.error("Could not set up database wrapper (see logs)")

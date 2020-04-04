@@ -100,6 +100,7 @@ class PSQLWrapper:
     else:
       try:
         self._log_(self._logger_.info, "%s" % sql)
+        self._log_(self._logger_.demo, "SQL:\n%s" % sql)
         cursor = transaction.cursor()
         cursor.execute(sql)
         transaction.commit()
