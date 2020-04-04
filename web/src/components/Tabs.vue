@@ -1,9 +1,30 @@
 <template>
   <div class="tabs">
-    <button class="active" id="0" @click="handleClick(0)">Workers</button>
-    <button id="1" @click="handleClick(1)">Tracks</button>
-    <button id="2" @click="handleClick(2)">Sales</button>
-    <button id="3" @click="handleClick(3)">Train</button>
+    <button
+      class="active"
+      id="0"
+      @click="handleClick(0)"
+    >
+      Workers
+    </button>
+    <button
+      id="1"
+      @click="handleClick(1)"
+    >
+      Tracks
+    </button>
+    <button
+      id="2"
+      @click="handleClick(2)"
+    >
+      Sales
+    </button>
+    <button
+      id="3"
+      @click="handleClick(3)"
+    >
+      Train
+    </button>
   </div>
 </template>
 
@@ -30,8 +51,8 @@ export default {
   background-color: #414141;
 
   > button {
-      font-size: 100%;
-      font-family: inherit;
+      font-size: 110%;
+      font-family: 'Raleway', sans-serif;
       border: 0;
       padding: 0;
       display: flex;
@@ -39,7 +60,8 @@ export default {
       height: 100px;
       justify-content: center;
       align-items: center;
-      border-bottom: gray solid 1px;
+      border-bottom: lightgray solid 1px;
+      background-color: white;
   }
 
   > .active {
