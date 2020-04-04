@@ -5,7 +5,10 @@
       :title="this.currentFormHeader"
       hide-footer
     >
-      <add-worker-form @submit="$bvModal.hide('modal-1')" />
+      <add-worker-form v-if="formIndex === 0" />
+      <delete-worker-form v-if="formIndex === 1" />
+      <get-worker-form v-if="formIndex === 2" />
+      <change-table-row-form v-if="formIndex === 3" />
     </b-modal>
     <h2>Manage All Workers</h2>
     <div class="l-row">
@@ -47,11 +50,22 @@
       <a
         href="#"
         v-b-modal.modal-1
-        @click="currentFormHeader='Add New Worker'; "
+        @click="currentFormHeader='Add New Worker'; formIndex = 0"
       >Add New Worker</a>
-      <a href="#">Delete Worker</a>
-      <a href="#">Get Worker</a>
-      <a href="#">Change Table Rows</a>
+      <a 
+        href="#"
+        v-b-modal.modal-1
+        @click="currentFormHeader='Delete Worker'; formIndex = 1"
+        >Delete Worker</a>
+      <a
+        href="#"
+        v-b-modal.modal-1
+        @click="currentFormHeader='Get Worker'; formIndex = 2">
+        Get Worker</a>
+      <a href="#"
+        v-b-modal.modal-1
+        @click="currentFormHeader='Change Table Rows'; formIndex = 3">
+        Change Table Rows</a>
     </div>
   </div>
 </template>
@@ -59,11 +73,16 @@
 <script>
 import workerCalls from '../../utils/workerCalls.js'
 import AddWorkerForm from './AddWorkerForm.vue'
+import DeleteWorkerForm from './DeleteWorkerForm.vue'
+import GetWorkerForm from './GetWorkerForm.vue'
+import ChangeTableRowForm from './ChangeTableRowForm.vue'
 
 export default {
   name: 'Workers',
   components: {
       AddWorkerForm,
+      DeleteWorkerForm,
+      GetWorkerForm,
   },
   data() {
     return {
