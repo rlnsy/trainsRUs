@@ -665,6 +665,26 @@ VALUES
 INSERT INTO
   Works_On
 VALUES
+  (9, 1);
+
+INSERT INTO
+  Works_On
+VALUES
+  (9, 2);
+
+INSERT INTO
+  Works_On
+VALUES
+  (9, 3);
+
+INSERT INTO
+  Works_On
+VALUES
+  (9, 4);
+
+INSERT INTO
+  Works_On
+VALUES
   (9, 5);
 
 INSERT INTO

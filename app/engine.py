@@ -443,6 +443,31 @@ class Engine:
       'message': 'Segment updated'
     }
 
+  """
+  Get overworked workers
+  """
+
+  def get_overworked(self):
+    query = """
+      SELECT W.worker_id 
+      FROM Maintenance_Worker W 
+      WHERE
+      NOT EXISTS 
+        (SELECT * 
+          FROM Segment S
+         WHERE NOT EXISTS
+          (SELECT WO.maintenance_worker_id
+            FROM Works_On WO
+            WHERE W.worker_id = WO.maintenance_worker_id AND 
+              S.id = WO.segment_id));
+            """
+    results = self._dbw.execute(query)
+    wids = []
+    for r in results:
+      wid = r[0]
+      wids.append(wid)
+    return wids
+
 
   """
   Get worker shifts

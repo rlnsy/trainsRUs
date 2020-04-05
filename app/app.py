@@ -224,6 +224,10 @@ def station():
 @app.route(("/%s/stat/trip/length" % VERSION_1), methods=["GET"])
 def avg_trip_length_stat():
   return compute_request(lambda: json_response(engine.get_avg_trip_length(), status_code=SUCCESS_OK))
+
+@app.route(("/%s/worker/overworked" % VERSION_1), methods=["GET"])
+def overworked():
+  return compute_request(lambda: json_response(engine.get_overworked(), status_code=SUCCESS_OK))
       
 
 """
