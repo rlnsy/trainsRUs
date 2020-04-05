@@ -219,6 +219,12 @@ VALUES
     '994 3rd St'
   );
 
+-- Insert into UID the highest id so far for passenger
+INSERT INTO
+  UID
+VALUES
+  ('passenger', 5);
+
 INSERT INTO
   Class
 VALUES
@@ -275,6 +281,11 @@ VALUES
   (5, '8:00', '12:00');
 
 INSERT INTO
+  UID
+VALUES
+  ('trip', 5);
+
+INSERT INTO
   Ticket
 VALUES
   (1, 3, 'First', 1);
@@ -323,6 +334,11 @@ INSERT INTO
   Train
 VALUES
   (5, 250);
+
+INSERT INTO
+  UID
+VALUES
+  ('train', 5);
 
 INSERT INTO
   Train_Has_Class
@@ -542,6 +558,11 @@ VALUES
   );
 
 INSERT INTO
+  UID
+VALUES
+  ('worker', 16);
+
+INSERT INTO
   Maintenance_Worker
 VALUES
   (1);
@@ -615,6 +636,11 @@ INSERT INTO
   Segment
 VALUES
   (5, 300, NULL, 'South', 'North');
+
+INSERT INTO
+  UID
+VALUES
+  ('segment', 5);
 
 INSERT INTO
   Works_On
