@@ -1,7 +1,19 @@
 ---------------------------------------------------------
 -- Defines schema and initial tuples for Trains 'R' Us --
 ---------------------------------------------------------
--- Tables
+
+------------------------------------------------
+-- A single table for keeping track of unique --
+-- IDs for other tables                       --
+------------------------------------------------
+
+CREATE TABLE UID(prefix char(20) PRIMARY KEY, cur_id int);
+
+
+------------------------------------------------
+--           The actual data tables           --
+------------------------------------------------
+
 CREATE TABLE Address(address char(150) PRIMARY KEY, city char(50));
 
 CREATE TABLE Passenger(
@@ -119,7 +131,9 @@ CREATE TABLE Works_Shift(
   FOREIGN KEY (segment_id) REFERENCES Segment (id) ON DELETE CASCADE
 );
 
--- Tuples
+------------------------------------------------
+--              Initial Tuples                --
+------------------------------------------------
 INSERT INTO
   Address
 VALUES
