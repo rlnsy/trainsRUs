@@ -1,37 +1,72 @@
 import axios from 'axios'
+import { baseUrl, JSONheader, Conditions} from './constants.js'
 
 async function getSummary() {
+    const goodCount = await getStats(Conditions.GOOD).numSegments
+    const repairCount = await getStats(Conditions.REPAIRS).numSegments
+    const criticalCount = await getStats(Conditions.CRITICAL).numSegments
+
     return {
-        totalTracks: 14,
-        needRepairs: 3,
-        criticalCondition: 1,
+        totalTracks: goodCount + repairCount + criticalCount,
+        needRepairs: repairCount,
+        criticalCondition: criticalCount,
     }
 }
 
-async function getAllTracks(cond) {
-    return [
-        {
-            segmentID: 'ts2',
-            startStation: 'Central Station',
-            endStation: 'East Station',
-            condition: 'Normal',
-            length: 330,
+async function getStats(status){
+    axios({
+        method: 'GET',
+        url: baseUrl + '/segment/status/count',
+        params: {
+            'body': JSON.stringify({
+                'status': status
+            })
         },
-        {
-            segmentID: 'ts673',
-            startStation: 'Lake Port Station',
-            endStation: 'Vancouver Station',
-            condition: 'Critical',
-            length: 1000,
-        },
-        {
-            segmentID: 'ts3215',
-            startStation: 'Townsville Station',
-            endStation: 'Central Station',
-            condition: 'Needs Repair',
-            length: 660,
-        },
-    ].filter(t => cond === '' ? true : t.condition === cond)
+    }).then((response) => {
+        return response
+    }, (error) => {
+        throw error
+    })
 }
 
-export default { getSummary, getAllTracks }
+async function getAllTracks(cond) {
+    if(cond){ 
+        axios({
+            method: 'GET',
+            url: baseUrl + '/segment',
+            params: {
+                'body': JSON.stringify({
+                    'condition': cond
+                })
+            },
+        }).then((response) => {
+            return response
+        }, (error) => {
+            throw error
+        })
+    } else {
+        axios({
+            method: 'GET',
+            url: baseUrl + '/segment/status',
+        }).then((response) => {
+            return response
+        }, (error) => {
+            throw error
+        })
+    }
+}
+
+async function updateSegment(formData){
+    axios({
+        method: 'PUT',
+        url: baseUrl + '/segment/status',
+        headers: JSONheader,
+        data: JSON.stringify(formData)
+    }).then((response) => {
+        return response
+    }, (error) => {
+        throw error
+    })
+}
+
+export default { getSummary, getAllTracks, updateSegment }

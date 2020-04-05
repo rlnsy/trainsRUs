@@ -11,3 +11,9 @@ export const Conditions = {
     REPAIRS: 'Needs Repairs',
     CRITICAL: 'Critical',
 }
+
+export const JSONheader = { 
+    'content-type': 'application/json',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+ }

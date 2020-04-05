@@ -11,6 +11,14 @@
         @submit="handleFilter"
       />
     </b-modal>
+    <b-alert
+      v-model="showDismissibleAlert"
+      variant="danger"
+      dismissible
+      style="max-width: 50vw;"
+    >
+      {{ alertText }}
+    </b-alert>
     <h2>Track Segment Maintenance</h2>
     <div class="l-row">
       <h4>Summary Stats</h4>
@@ -94,14 +102,26 @@ export default {
       currentFormHeader: '',
       formIndex: 0,
       tableCondition: '',
+      showDismissibleAlert: false,
+      alertText: '',
     }
   },
   methods: {
       async loadSummary() {
+        try {
           this.summaryStats = await trackCalls.getSummary()
+        } catch (error) {
+          this.alertText = error
+          this.showDismissibleAlert = true
+        }
       },
       async loadTable() {
-          this.tracks =  await trackCalls.getAllTracks(this.tableCondition)
+        try {
+          this.tracks = await trackCalls.getAllTracks(this.tableCondition)
+        } catch (error) {
+          this.alertText = error
+          this.showDismissibleAlert = true
+        }
       },
       async handleFilter(evt) {
           this.tableCondition = evt

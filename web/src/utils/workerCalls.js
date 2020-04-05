@@ -1,11 +1,7 @@
 import axios from 'axios'
-import { baseUrl } from './constants.js'
+import { baseUrl, JSONheader } from './constants.js'
 
-const JSONheader = { 
-    'content-type': 'application/json',
-    'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache',
- }
+
 
 async function getSummary() {
     var days = ['S','M','T','W','Th','F','Sa'];
