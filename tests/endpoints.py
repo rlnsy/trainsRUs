@@ -337,7 +337,6 @@ class TestEndpoints(unittest.TestCase):
       data={
         'trackLengh': "100",
         'condition': "Looking Good",
-        'role': "Train Conductor",
         'startStation': "West",
         'endStation': "North"
     })
@@ -404,7 +403,7 @@ class TestEndpoints(unittest.TestCase):
     res = put(resource("/segment/status"),
       data={
         'segmentId': 1,
-        'newStatus': "Broken"
+        'status': "Broken"
       })
     self.assertEqual(res.status_code, 201)
     res = get(resource("/segment"), data={'segmentId': 1}, decode_response=True)
@@ -422,6 +421,75 @@ class TestEndpoints(unittest.TestCase):
       data={
         'segmentId': 9999,
         'newStatus': "Broken"
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_update_status_5(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 1,
+        'length': 3000
+      })
+    self.assertEqual(res.status_code, 201)
+    res = get(resource("/segment"), data={'segmentId': 1}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data'],
+      {
+        'condition': "Broken",
+        'endStation': "West",
+        'startStation': "East",
+        'trackLength': 3000
+      })
+
+  def test_update_status_5_pt_5(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 1,
+        'length': "three"
+      })
+    self.assertEqual(res.status_code, 400)
+
+  def test_update_status_6(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 1,
+        'endStation': "North",
+        'startStation': "West"
+      })
+    self.assertEqual(res.status_code, 201)
+    res = get(resource("/segment"), data={'segmentId': 1}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data'],
+      {
+        'condition': "Broken",
+        'endStation': "North",
+        'startStation': "West",
+        'trackLength': 3000
+      })
+
+  def test_update_status_7(self):
+    res = put(resource("/segment/status"),
+      data={
+        'endStation': "North",
+        'startStation': "West"
+      })
+    self.assertEqual(res.status_code, 400)
+
+  def test_update_status_8(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 1,
+        'endStation': "North",
+        'startStation': "NOT A REAL STATION"
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_update_status_9(self):
+    res = put(resource("/segment/status"),
+      data={
+        'segmentId': 1,
+        'endStation': "NOT A REAL STATION",
+        'startStation': "West"
       })
     self.assertEqual(res.status_code, 404)
 
@@ -649,6 +717,35 @@ class TestEndpoints(unittest.TestCase):
     res = get(resource("/stat/trip/length"), decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data']['avgTripLength'], 1.0)
+
+
+  """
+  Station endpoints
+  """
+
+  def test_station_info_1(self):
+    res = get(resource("/station"),
+      data={
+        'sname': "NOT A REAL STATION"
+      })
+    self.assertEqual(res.status_code, 404)
+
+  def test_station_info_2(self):
+    res = get(resource("/station"),
+      data={}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertIs(type(res['data']), list)
+
+  def test_station_info_3(self):
+    res = get(resource("/station"),
+      data={ 'sname': "East"}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data'], 
+      {
+        'sname': "East",
+        'location': "Port City",
+        'trainCapacity': 100
+      })
 
 
 """

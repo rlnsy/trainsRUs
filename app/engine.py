@@ -433,12 +433,41 @@ class Engine:
   """
 
   def update_segment(self, i):
-    v = self.extract_fields(['segmentId', 'newStatus'], i)
-    self.get_segment_info({ 'segmentId': v['segmentId'] })
+    v = self.extract_fields(['segmentId'], i)
+    seg = self.get_segment_info({ 'segmentId': v['segmentId'] })
+    start_station = seg['startStation']
+    end_station = seg['endStation']
+    length = seg['trackLength']
+    status = seg['condition']
+    updates = 0
+    if 'startStation' in i:
+      start_station = i['startStation']
+      self.get_station({'sname': start_station})
+      updates += 1
+    if 'endStation' in i:
+      end_station = i['endStation']
+      self.get_station({'sname': end_station})
+      updates += 1
+    if 'length' in i:
+      length = i['length']
+      updates += 1
+      if type(length) is not int:
+        raise InputDomainError()
+    if 'status' in i:
+      status = i['status']
+      updates += 1
+    if updates == 0:
+      raise MissingInput("No fields to update")
     self._dbw.execute(
       """
-      UPDATE Segment SET condition = '%s' WHERE id = %d;
-      """ % (v['newStatus'], v['segmentId']))
+      UPDATE Segment 
+      SET
+        track_length = %d,
+        condition = '%s',
+        start_station_name = '%s',
+        end_station_name = '%s'
+      WHERE id = %d;
+      """ % (length, status, start_station, end_station, v['segmentId']))
     return {
       'message': 'Segment updated'
     }
@@ -660,7 +689,30 @@ class Engine:
     raise HandlerNotImplemented()
 
   def get_station(self, i):
-    raise HandlerNotImplemented()
+    if 'sname' in i:
+      search = self._dbw.execute(
+        """
+      SELECT * FROM Station WHERE name = '%s';
+        """ % i['sname']) 
+      if len(search) == 0:
+        raise NotFound("Station %s does not exist" % i['sname'])
+      else:
+        match = search[0]
+        return {
+        'sname': trim(match[0]),
+        'location': trim(match[1]),
+        'trainCapacity': match[2]
+      }
+    else:
+      search = self._dbw.execute(
+        """
+      SELECT * FROM Station;
+        """)
+      results = []
+      for s in search:
+        sname = s[0]
+        results.append(self.get_station({'sname': sname}))
+      return results
 
   def update_station(self, i):
     raise HandlerNotImplemented()
