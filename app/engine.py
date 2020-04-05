@@ -3,7 +3,6 @@ from utils import ApplicationLogger, trim_char_seq as trim
 
 
 EXECUTE_TOKEN = "61YYZlA!QkeZ3V7NtY9OPDvN$u7N^E&t"
-DEFAULT_LOW_ID = 1000 # To avoid conflicts with tuples from init script
 
 """
 Define errors used for communication to outer layer
@@ -66,17 +65,30 @@ class Engine:
     """
     self._logger.info("Generating UID for %s" % prefix)
     new_id = None
-    records = self._dbw.execute("SELECT cur_id from UID WHERE prefix = '%s'" % prefix)
+    records = self._dbw.execute(
+      """
+      SELECT cur_id from UID WHERE prefix = '%s'
+      """ % prefix)
     if len(records) == 0:
-      # no id generated
+      """
+      no id generated
+      this suggests that no tuples of the form (<prefix>, _) 
+      exist in UID table
+      """
       self._logger.info("Prefix %s does not exist; creating" % prefix)
-      new_id = DEFAULT_LOW_ID
-      self._dbw.execute("INSERT INTO UID VALUES ('%s', %d)" % (prefix, new_id))
+      new_id = 0 # create the first id, 0
+      self._dbw.execute(
+        """
+      INSERT INTO UID VALUES ('%s', %d)
+        """ % (prefix, new_id))
     else:
       # previous id within prefix
       cur_id = records[0][0]
       new_id = cur_id + 1
-      self._dbw.execute("UPDATE UID SET cur_id = %d WHERE prefix = '%s'" % (new_id, prefix))
+      self._dbw.execute(
+        """
+      UPDATE UID SET cur_id = %d WHERE prefix = '%s'
+        """ % (new_id, prefix))
     self._logger.info("Generated ID: %d" % new_id)
     return new_id
 
