@@ -55,7 +55,7 @@ def _create_req_(method, url, data, decode_response):
   else:
     res = method(
       url,
-      params={'body': json.dumps(data) if (data is not None) else None}, 
+      params={'body': body}, 
       headers={'Content-Type':"application/json"})
   if decode_response:
     try:
