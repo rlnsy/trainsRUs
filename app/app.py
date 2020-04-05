@@ -108,6 +108,7 @@ def obj_request(k):
       data = request.args.get('body')
       req = json.loads(data)
     except Exception as e:
+      logger.error(str(request.args.get('body')))
       logger.error(str(e))
   else:  
     req = request.get_json()

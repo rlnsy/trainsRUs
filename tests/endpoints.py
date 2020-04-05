@@ -248,6 +248,23 @@ class TestEndpoints(unittest.TestCase):
       data={'fields': fields})
     self.assertEqual(res.status_code, 400)
 
+  def test_worker_info_11(self):
+    new_id = post(
+      resource("/worker"), 
+      data = self.SAMPLE_WORKER, 
+      decode_response=True)['data']['workerId']
+    fields = ['firstName']
+    res = get(resource("/worker"), 
+      data={
+        'workerId': new_id,
+        'fields': fields
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    for f in fields:
+      self.assertIn(f, res['data'])
+    for f in res['data']:
+      self.assertIn(f, fields)
+
 
   """ Update """
 
