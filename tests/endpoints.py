@@ -45,10 +45,18 @@ Test helpers
 """
 def _create_req_(method, url, data, decode_response):
   logger.info("Making request: %s" % json.dumps(data))
-  res = method(
-    url, 
-    data=json.dumps(data) if (data is not None) else None, 
-    headers={'Content-Type':"application/json"})
+  body = json.dumps(data) if (data is not None) else None
+  res = None
+  if method != requests.get:
+    res = method(
+      url,
+      data=body, 
+      headers={'Content-Type':"application/json"})
+  else:
+    res = method(
+      url,
+      params={'body': json.dumps(data) if (data is not None) else None}, 
+      headers={'Content-Type':"application/json"})
   if decode_response:
     try:
       return {

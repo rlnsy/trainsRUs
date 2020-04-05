@@ -102,7 +102,15 @@ def obj_request(k):
   result. Should k result in some error, an appropriate
   response will be sent.
   """
-  req = request.get_json()
+  req = None
+  if request.method == "GET":
+    try:
+      data = request.args.get('body')
+      req = json.loads(data)
+    except Exception as e:
+      logger.error(str(e))
+  else:  
+    req = request.get_json()
   if req is None or not isinstance(req,dict):
     return json_response(
       {
