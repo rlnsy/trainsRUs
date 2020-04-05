@@ -190,14 +190,63 @@ class TestEndpoints(unittest.TestCase):
       resource("/worker"), 
       data = self.SAMPLE_WORKER, 
       decode_response=True)['data']['workerId']
-    res = get(resource("/worker"), data={'workerId': new_id}, decode_response=True)
+    res = get(resource("/worker"), 
+      data={
+        'workerId': new_id
+      }, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'], self.SAMPLE_WORKER)
 
   def test_worker_info_6(self):
-    res = get(resource("/worker"), data={}, decode_response=True)
+    res = get(resource("/worker"), 
+      data={}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertIs(type(res['data']), list)
+
+  """ test projection """
+
+  def test_worker_info_7(self):
+    fields = ['firstName', 'phoneNumber', 'role', 'availability']
+    res = get(resource("/worker"), 
+      data={
+        'fields': fields
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertIs(type(res['data']), list)
+    self.assertGreater(len(res['data']), 0)
+    for f in fields:
+      self.assertIn(f, res['data'][0])
+    for f in res['data'][0]:
+      self.assertIn(f, fields)
+
+  def test_worker_info_8(self):
+    new_id = post(
+      resource("/worker"), 
+      data = self.SAMPLE_WORKER, 
+      decode_response=True)['data']['workerId']
+    fields = ['firstName', 'phoneNumber', 'role', 'availability']
+    res = get(resource("/worker"), 
+      data={
+        'workerId': new_id,
+        'fields': fields
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    for f in fields:
+      self.assertIn(f, res['data'])
+    for f in res['data']:
+      self.assertIn(f, fields)
+
+  def test_worker_info_9(self):
+    fields = ['firstName', 'not a real field', 'role', 'availability']
+    res = get(resource("/worker"), 
+      data={'fields': fields})
+    self.assertEqual(res.status_code, 400)
+
+  def test_worker_info_10(self):
+    fields = "cat"
+    res = get(resource("/worker"), 
+      data={'fields': fields})
+    self.assertEqual(res.status_code, 400)
 
 
   """ Update """

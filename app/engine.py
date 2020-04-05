@@ -216,11 +216,36 @@ class Engine:
   Get worker
   """
 
+  W_ATTR = {
+    'firstName': 'first_name',
+    'lastName': 'last_name',
+    'phoneNumber': 'phone_number',
+    'role': 'role_name',
+    'availability': 'availability'
+  }
+
   def get_single_worker(self, i, target_worker_type=None):
+    """
+    Gets a single worker, or many if no id is specified.
+    Supports field projection.
+    """
     if 'workerId' in i:
       v = self.extract_fields(['workerId'], i)
       if type(v['workerId']) is not int:
         raise InputDomainError()
+      fields = []
+      if 'fields' in i:
+        if type(i['fields']) is not list:
+          raise InputDomainError("Fields must be a list")
+        for f in i['fields']:
+          if f != 'workerType':
+            if f not in self.W_ATTR:
+              raise InputDomainError("Field %s is not valid for Worker" % str(f))
+            else:
+              fields.append(f)
+      else:
+        fields = self.W_ATTR.keys()
+      attr_selection = ",".join([self.W_ATTR[f] for f in fields])
       match = None
       worker_type = None
       for t in self.WORKER_TABLES:
@@ -228,14 +253,14 @@ class Engine:
         search = self._dbw.execute(
         """
       SELECT
-      * 
+      %s 
       FROM
         Worker INNER JOIN %s
         ON %s.worker_id = Worker.id
       WHERE
         Worker.id = %d;
         """
-        % (table, table, v['workerId']))
+        % (attr_selection, table, table, v['workerId']))
         if len(search) != 0:
           match = search[0]
           worker_type = t
@@ -247,15 +272,18 @@ class Engine:
             (target_worker_type is not None)):
           raise NotFound(
         "Worker %d is not of type %s" % (v['workerId'], target_worker_type))
-        return {
-          'firstName': trim(match[1]),
-          'lastName': trim(match[2]),
-          'phoneNumber': trim(match[3]),
-          'role': trim(match[4]),
-          'availability': trim(match[5]),
-          'workerType': worker_type
-        }
+        result = {}
+        for j, f in enumerate(fields):
+          val = match[j]
+          if type(val) is str:
+            result[f] = trim(val)
+          else:
+            result[f] = val
+        if ('fields' in i) and (worker_type in i['fields']) or ('fields' not in i):
+          result['workerType'] = worker_type
+        return result
     else:
+      # All workers case
       search = self._dbw.execute(
         """
       SELECT * FROM Worker;
@@ -263,7 +291,10 @@ class Engine:
       results = []
       for w in search:
         wid = w[0]
-        results.append(self.get_single_worker({'workerId': wid}))
+        if 'fields' in i:
+          results.append(self.get_single_worker({'workerId': wid, 'fields': i['fields']}))
+        else:
+          results.append(self.get_single_worker({'workerId': wid}))
       return results
 
 
