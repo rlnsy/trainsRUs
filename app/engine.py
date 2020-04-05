@@ -205,15 +205,16 @@ class Engine:
   """
 
   def get_single_worker(self, i, target_worker_type=None):
-    v = self.extract_fields(['workerId'], i)
-    if type(v['workerId']) is not int:
-      raise InputDomainError()
-    match = None
-    worker_type = None
-    for t in self.WORKER_TABLES:
-      table = self.WORKER_TABLES[t]
-      search = self._dbw.execute(
-      """
+    if 'workerId' in i:
+      v = self.extract_fields(['workerId'], i)
+      if type(v['workerId']) is not int:
+        raise InputDomainError()
+      match = None
+      worker_type = None
+      for t in self.WORKER_TABLES:
+        table = self.WORKER_TABLES[t]
+        search = self._dbw.execute(
+        """
       SELECT
       * 
       FROM
@@ -221,27 +222,37 @@ class Engine:
         ON %s.worker_id = Worker.id
       WHERE
         Worker.id = %d;
-      """
-      % (table, table, v['workerId']))
-      if len(search) != 0:
-        match = search[0]
-        worker_type = t
-        break
-    if match is None:
-      raise NotFound("Worker %d does not exist" % v['workerId'])
+        """
+        % (table, table, v['workerId']))
+        if len(search) != 0:
+          match = search[0]
+          worker_type = t
+          break
+      if match is None:
+        raise NotFound("Worker %d does not exist" % v['workerId'])
+      else:
+        if ((worker_type != target_worker_type) and 
+            (target_worker_type is not None)):
+          raise NotFound(
+        "Worker %d is not of type %s" % (v['workerId'], target_worker_type))
+        return {
+          'firstName': trim(match[1]),
+          'lastName': trim(match[2]),
+          'phoneNumber': trim(match[3]),
+          'role': trim(match[4]),
+          'availability': trim(match[5]),
+          'workerType': worker_type
+        }
     else:
-      if ((worker_type != target_worker_type) and 
-          (target_worker_type is not None)):
-        raise NotFound(
-      "Worker %d is not of type %s" % (v['workerId'], target_worker_type))
-      return {
-        'firstName': trim(match[1]),
-        'lastName': trim(match[2]),
-        'phoneNumber': trim(match[3]),
-        'role': trim(match[4]),
-        'availability': trim(match[5]),
-        'workerType': worker_type
-      }
+      search = self._dbw.execute(
+        """
+      SELECT * FROM Worker;
+        """)
+      results = []
+      for w in search:
+        wid = w[0]
+        results.append(self.get_single_worker({'workerId': wid}))
+      return results
 
 
   """
@@ -347,23 +358,35 @@ class Engine:
   """
 
   def get_segment_info(self, i):
-    v = self.extract_fields(['segmentId'], i)
-    if type(v['segmentId']) is not int:
-      raise InputDomainError()
-    search = self._dbw.execute(
-      """
+    if 'segmentId' in i:
+      if type(i['segmentId']) is not int:
+        raise InputDomainError()
+      search = self._dbw.execute(
+        """
       SELECT * FROM Segment WHERE id = %d;
-      """ % v['segmentId']) 
-    if len(search) == 0:
-      raise NotFound("Segment %d does not exist" % v['segmentId'])
+        """ % i['segmentId']) 
+      if len(search) == 0:
+        raise NotFound("Segment %d does not exist" % i['segmentId'])
+      else:
+        match = search[0]
+        return {
+        'trackLength': match[1],
+        'condition': trim(match[2]),
+        'startStation': trim(match[3]),
+        'endStation': trim(match[4])
+      }
+    elif 'condition' in i:
+      search = self._dbw.execute(
+        """
+      SELECT * FROM Segment WHERE condition = '%s';
+        """ % i['condition'])
+      results = []
+      for s in search:
+        sid = s[0]
+        results.append(self.get_segment_info({'segmentId': sid}))
+      return results
     else:
-      match = search[0]
-      return {
-      'trackLength': match[1],
-      'condition': trim(match[2]),
-      'startStation': trim(match[3]),
-      'endStation': trim(match[4])
-    }
+      raise MissingInput
 
   def get_segment_status_count(self, i):
     v = self.extract_fields(['status'], i)

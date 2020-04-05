@@ -169,14 +169,6 @@ class TestEndpoints(unittest.TestCase):
       res = get(resource("/worker"))
       self.assertEqual(res.status_code, 400)
 
-  def test_worker_info_2(self):
-    res = get(resource("/worker"), data={})
-    self.assertEqual(res.status_code, 400)
-
-  def test_worker_info_3(self):
-    res = get(resource("/worker"), data={'id': 27837})
-    self.assertEqual(res.status_code, 400)
-
   def test_worker_info_3_pt5(self):
     res = get(resource("/worker"), data={'workerId': "27837"})
     self.assertEqual(res.status_code, 400)
@@ -193,6 +185,11 @@ class TestEndpoints(unittest.TestCase):
     res = get(resource("/worker"), data={'workerId': new_id}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'], self.SAMPLE_WORKER)
+
+  def test_worker_info_6(self):
+    res = get(resource("/worker"), data={}, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertIs(type(res['data']), list)
 
 
   """ Update """
@@ -369,6 +366,14 @@ class TestEndpoints(unittest.TestCase):
         'segmentId': sid
       }, decode_response=True)
     self.assertEqual(res['data'], self.SAMPLE_SEGMENT)
+
+  def test_segment_info_4(self):
+    res = get(resource("/segment"), 
+      data={
+        'condition': "Broken"
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertIs(type(res['data']), list)
 
 
   """ Update status """
