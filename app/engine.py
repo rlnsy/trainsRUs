@@ -101,7 +101,9 @@ class Engine:
   """
 
   def sample(self):
-    query = "SELECT * from Train"
+    query = """
+      SELECT * from Train
+      """
     rows = self._dbw.execute(query)
     return {
       'executed': query,
@@ -114,7 +116,10 @@ class Engine:
     if v['ex_token'] != EXECUTE_TOKEN:
       raise NotAllowed("Invalid execute token")
     try:
-      result = self._dbw.execute(v['sql'])
+      result = self._dbw.execute(
+        """
+        %s
+        """ % v['sql'])
       return {
         'executed': v['sql'],
         'result': str(result)
@@ -178,10 +183,18 @@ class Engine:
     v = self.extract_fields(['workerId'], i)
     if type(v['workerId']) is not int:
       raise InputDomainError()
-    search = self._dbw.execute("SELECT * FROM Worker WHERE id=%d" % v['workerId'])
+    search = self._dbw.execute(
+      """
+      SELECT * FROM Worker
+      WHERE id=%d
+      """ % v['workerId'])
     if len(search) == 0:
       raise NotFound("Worker %d does not exist" % v['workerId'])
-    self._dbw.execute("DELETE FROM Worker WHERE id=%d" % v['workerId'])
+    self._dbw.execute(
+      """
+      DELETE FROM Worker
+      WHERE id=%d
+      """ % v['workerId'])
     return {
       'message': 'success'
     }
