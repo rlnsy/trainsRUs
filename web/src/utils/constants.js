@@ -1,4 +1,4 @@
-export const baseUrl = "https://localhost:6000/"
+export const baseUrl = "http://localhost:5000/v1"
 
 export const Departments = {
     STATION: 'Station',

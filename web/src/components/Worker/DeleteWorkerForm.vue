@@ -13,6 +13,7 @@
         id="input-1"
         v-model="form.id"
         :state="inputValidation.id"
+        type="number"
       />
       <b-button
         @click="onSubmit"
@@ -25,6 +26,7 @@
 </template>
 
 <script>
+import workerCalls from '../../utils/workerCalls.js'
 
 export default {
   name: 'DeleteWorkerForm',
@@ -42,16 +44,30 @@ export default {
       }
   },
   methods: {
-      onSubmit() {
+      async onSubmit() {
         if(this.validateForm()){
-            console.log(JSON.stringify(this.form))
-            this.form = {
-                id: '',
+            var postForm = {
+              'workerId': this.form.id,
             }
-            // TODO: Send ID to endpoint and verify success
-            this.alertText = "Worker Deleted"
-            this.alertType = "success"
-            this.showDismissibleAlert = true;
+            try {
+              const response = await workerCalls.deleteWorker(postForm)
+              this.form = {
+                id: '',
+              }
+              if(response.message === 'success'){ 
+                this.alertText = "Worker Deleted"
+                this.alertType = "success"
+                this.showDismissibleAlert = true;
+              } else {
+                this.alertText = response.message
+                this.alertType = "danger"
+                this.showDismissibleAlert = true;
+              }
+            } catch (error) {
+              this.alertText = error
+              this.alertType = "danger"
+              this.showDismissibleAlert = true;
+            }
         } else {
             this.alertText = "The following fields have issues: "
             this.alertType = "danger"
