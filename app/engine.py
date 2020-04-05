@@ -686,7 +686,30 @@ class Engine:
   """
 
   def create_station(self, i):
-    raise HandlerNotImplemented()
+    v = self.extract_fields(
+      [
+        'sname', 'capacity', 'location', 
+      ], i)
+    if type(v['capacity']) is not int:
+      raise InputDomainError("Capacity must be an integer")
+    search = self._dbw.execute(
+      """
+      SELECT * FROM Station
+      WHERE 
+        name = '%s'
+      """ % v['sname'])
+    if len(search) > 0:
+      raise NotAllowed("Station %s already exists and you cannot add it again" % v['sname'])
+    self._dbw.execute((
+      """
+      INSERT INTO Station VALUES ('%s', '%s', %d);
+      """
+      % (v['sname'], 
+      v['location'], 
+      v['capacity'])))
+    return {
+      'message': "Station created"
+    }
 
   def get_station(self, i):
     if 'sname' in i:

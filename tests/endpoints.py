@@ -747,6 +747,43 @@ class TestEndpoints(unittest.TestCase):
         'trainCapacity': 100
       })
 
+  def test_create_station_1(self):
+    res = post(resource("/station"),
+      data={})
+    self.assertEqual(res.status_code, 400)
+    res = post(resource("/station"),
+      data={'sname': "Hi"})
+    self.assertEqual(res.status_code, 400)
+    res = post(resource("/station"),
+      data={'sname': "HI", 'capacity': 4})
+    self.assertEqual(res.status_code, 400)
+    res = post(resource("/station"),
+      data={'sname': "HI", 'capacity': 4})
+    self.assertEqual(res.status_code, 400)
+    res = post(resource("/station"),
+      data={'sname': "HI", 'location': "Canada", 'capacity': '4'})
+    self.assertEqual(res.status_code, 400)
+
+  def test_create_station_2(self):
+    res = post(resource("/station"),
+      data={
+        'sname': "Station Rowan",
+        'capacity': 100,
+        'location': "Port City"
+    }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 201)
+    self.assertEqual(res['data']['message'], "Station created")
+
+  def test_create_station_3(self):
+    res = post(resource("/station"),
+      data={
+        'sname': "Station Rowan",
+        'capacity': 100,
+        'location': "Port City"
+    }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 403)
+    self.assertIn('message', res['data'])
+
 
 """
 Runtime procedure
