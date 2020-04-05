@@ -1,6 +1,7 @@
 import psycopg2
 import time
 from utils import trim_char_seq as trim
+from decimal import Decimal
 
 
 """
@@ -75,6 +76,8 @@ class PSQLWrapper:
           data += "%s " % ("true" if val else "false")
         elif val is None:
           data += "NULL "
+        elif type(val) is Decimal:
+          data += "%f " % float(val)
         else:
           data += "%s " % val
       return data
