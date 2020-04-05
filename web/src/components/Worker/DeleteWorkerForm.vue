@@ -47,7 +47,7 @@ export default {
       async onSubmit() {
         if(this.validateForm()){
             var postForm = {
-              'workerId': this.form.id,
+              'workerId': Number(this.form.id),
             }
             try {
               const response = await workerCalls.deleteWorker(postForm)

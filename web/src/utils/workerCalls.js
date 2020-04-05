@@ -9,7 +9,7 @@ async function getSummary() {
     var workingToday = 0
     var now = new Date();
     var day = days[ now.getDay() ];
-    const allWorkers = await this.getAllWorkers()
+    var allWorkers = await this.getAllWorkers()
 
     totalWorkers = allWorkers.length
     workingToday = allWorkers.filter(w => w.availability.split(' ').includes(day)).length
@@ -25,6 +25,9 @@ async function getAllWorkers() {
     axios({
         method: 'GET',
         url: url,
+        params: {
+            'body': '{}'
+        }
     }).then((response) => {
         return response
     }, (error) => {
@@ -34,14 +37,11 @@ async function getAllWorkers() {
 
 async function getWorker(formData) {
     const url = baseUrl + '/worker'
-    const request = {}
-    request.workerId = Number(formData.id)
-    const requestData = JSON.stringify(request)
     axios({
         method: 'GET',
         url: url,
         params: {
-            'body': requestData
+            'body': JSON.stringify(formData)
         },
     }).then((response) => {
         return response

@@ -2,43 +2,41 @@ import axios from 'axios'
 import { baseUrl } from './constants.js'
 
 async function getSummary(id) {
+    const all = await this.allShifts(id)
+    const total = all.length
+    const tripIDSet = Set()
+    all.forEach(shift => tripIDSet.add(shift.tripId))
     return {
-        upcomingShifts: 14,
-        distinctTrips: 3,
+        upcomingShifts: total,
+        distinctTrips: tripIDSet.size(),
     }
 }
 
 async function getShifts(id) {
-    return [
-        {
-            tripID: 't321',
-            segmentID: 's123',
-            startStation: 'Central Station',
-            endStation: 'East Station',
+    const url = baseUrl + '/shift'
+    const request = {}
+    request.workerId = Number(id)
+    const requestData = JSON.stringify(request)
+    axios({
+        method: 'GET',
+        url: url,
+        params: {
+            'body': requestData
         },
-        {
-            tripID: 't321',
-            segmentID: 's123',
-            startStation: 'Central Station',
-            endStation: 'East Station',
-        },
-        {
-            tripID: 't321',
-            segmentID: 's123',
-            startStation: 'Central Station',
-            endStation: 'East Station',
-        },
-    ]
+    }).then((response) => {
+        return response
+    }, (error) => {
+        throw error
+    })
 }
 
-async function getTicketInfo(IDs) {
+async function getTicketInfo(formData) {
     axios({
         method: 'get',
-        url: baseUrl + "ticket/info",
-        data: {
-            tripID: IDs.tripID,
-            ticketID: IDs.ticketID
-        }
+        url: baseUrl + "/ticket/info",
+        params: {
+            'body': JSON.stringify(formData)
+        },
     }).then((response) => {
         response.valid = true;
         return response

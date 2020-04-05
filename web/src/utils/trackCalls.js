@@ -48,6 +48,9 @@ async function getAllTracks(cond) {
         axios({
             method: 'GET',
             url: baseUrl + '/segment/status',
+            params: {
+                'body': '{}'
+            }
         }).then((response) => {
             return response
         }, (error) => {

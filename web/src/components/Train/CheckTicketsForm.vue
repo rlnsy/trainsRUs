@@ -8,17 +8,19 @@
       >
         {{ alertText }}
       </b-alert>
-      <label for="input-1">Ticket ID</label>
+      <label for="input-1">Seat Number</label>
       <b-form-input
         id="input-1"
-        v-model="form.ticketID"
-        :state="inputValidation.ticketID"
+        v-model="form.seatNumber"
+        :state="inputValidation.seatNumber"
+        type="number"
       />
       <label for="input-2">Trip ID</label>
       <b-form-input
         id="input-2"
         v-model="form.tripID"
         :state="inputValidation.tripID"
+        type="number"
       />
       <b-button
         @click="onSubmit"
@@ -48,11 +50,11 @@ export default {
   data() {
       return {
         form: {
-          ticketID: '',
+          seatNumber: '',
           tripID: '',
         },
         inputValidation: {
-          ticketID: null,
+          seatNumber: null,
           tripID: null,
         },
         showDismissibleAlert: false,
@@ -64,9 +66,18 @@ export default {
   methods: {
       async onSubmit() {
         if(this.validateForm()){
-            console.log(JSON.stringify(this.form))
-            this.ticketInfo = await trainCalls.getTicketInfo(JSON.stringify(this.form)) 
-            cardVariant = this.ticketInfo.valid ? 'success' : 'danger'
+            const postForm = {
+              'tripId': Number(this.form.tripID),
+              'seatNumber': Number(this.form.seatNumber)
+            }
+            try {
+              this.ticketInfo = await trainCalls.getTicketInfo(postForm)
+              this.cardVariant = 'success'
+            } catch (error) {
+              this.cardVariant = 'danger'
+              this.alertText = error
+              this.showDismissibleAlert = true;
+            }
         } else {
             this.alertText = "The following fields have issues: "
             for(var input in this.inputValidation){
@@ -77,11 +88,11 @@ export default {
       },
       validateForm() {
           var valid = true
-          if (typeof this.form.ticketID !== 'string' || !this.form.ticketID instanceof String || this.form.ticketID === ''){
-              this.inputValidation.ticketID = false;
+          if (typeof this.form.seatNumber !== 'string' || !this.form.seatNumber instanceof String || this.form.seatNumber === ''){
+              this.inputValidation.seatNumber = false;
               valid = false;
           } else {
-              this.inputValidation.ticketID = null;
+              this.inputValidation.seatNumber = null;
           } 
           if (typeof this.form.tripID !== 'string' || !this.form.tripID instanceof String || this.form.tripID === ''){
               this.inputValidation.tripID = false;

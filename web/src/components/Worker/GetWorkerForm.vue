@@ -52,8 +52,10 @@ export default {
       async onSubmit() {
         if(this.validateForm()){
             try {
-              const response = await workerCalls.getWorker(this.form)
-              console.log(response)
+              const postForm = {
+                'workerId': Number(this.form.id)
+              }
+              const response = await workerCalls.getWorker(postForm)
               this.workerInfo = response.data
               this.form = {
                 id: '',
