@@ -47,16 +47,7 @@ export default {
   methods: {
       onSubmit() {
         if(this.validateForm()){
-            // TODO: Send form to GET endpoint and verify success
-            console.log(JSON.stringify(this.form))
-
-            // if successful:            
-            this.alertText = "Call Successful"
-            this.alertType = "success"
-            this.showDismissibleAlert = true;
-
             this.$emit('submit', this.form.condition)
-
             this.form = {
                 condition: '',
             }

@@ -13,6 +13,7 @@
         id="input-1"
         v-model="form.id"
         :state="inputValidation.id"
+        type="number"
       />
       <label for="input-2">New Length (Optional)</label>
       <b-form-input
@@ -55,6 +56,7 @@
 <script>
 import { Conditions } from '../../utils/constants.js'
 import stationCalls from '../../utils/stationCalls.js'
+import trackCalls from '../../utils/trackCalls.js'
 
 export default {
   name: 'UpdateSegmentForm',
@@ -86,11 +88,11 @@ export default {
     this.stations = allStations.map(s => s.sname)
   },
   methods: {
-      onSubmit() {
+      async onSubmit() {
         if(this.validateForm()){
             // TODO: Send form to PUT endpoint and verify success
             var postForm = {
-                id: this.form.id
+                segmentId: this.form.id
             } 
 
             for(var key in this.form){
@@ -99,13 +101,23 @@ export default {
                 }
             }
 
-            console.log(JSON.stringify(postForm))
-
-            // if successful:            
-            this.alertText = "Segment Updated"
-            this.alertType = "success"
-            this.showDismissibleAlert = true;
-
+            try {
+              const response = await trackCalls.updateSegment(postForm)
+              if(response.message === 'success'){ 
+                this.alertText = "Segment Updated"
+                this.alertType = "success"
+                this.showDismissibleAlert = true;
+              } else {
+                this.alertText = response.message
+                this.alertType = "danger"
+                this.showDismissibleAlert = true;
+              }
+            } catch (error) {
+              this.alertText = error
+              this.alertType = "danger"
+              this.showDismissibleAlert = true;
+            }
+    
             this.form = {
                 id: '',
                 length: '',

@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import workerCalls from '../../utils/workerCalls'
 
 export default {
   name: 'GetWorkerForm',
@@ -48,13 +49,21 @@ export default {
       }
   },
   methods: {
-      onSubmit() {
+      async onSubmit() {
         if(this.validateForm()){
-            console.log(JSON.stringify(this.form))
-            this.form = {
+            try {
+              const postForm = {
+                'workerId': Number(this.form.id)
+              }
+              const response = await workerCalls.getWorker(postForm)
+              this.workerInfo = response.data
+              this.form = {
                 id: '',
+              }
+            } catch (error) {
+              this.alertText = error
+              this.showDismissibleAlert = true;
             }
-            // TODO: Set workerInfo Object based on response
         } else {
             this.alertText = "The following fields have issues: "
             for(var input in this.inputValidation){

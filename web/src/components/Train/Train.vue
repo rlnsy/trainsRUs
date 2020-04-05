@@ -102,10 +102,18 @@ export default {
   },
   methods: {
       async loadSummary() {
+        try{
           this.summaryStats = await trainCalls.getSummary(this.id)
+        } catch(error) {
+          this.displayError(error)
+        }
       },
       async loadTable() {
+        try {
           this.shifts =  await trainCalls.getShifts(this.id)
+        } catch(error) {
+          this.displayError(error)
+        }
       },
       async onSubmit() {
           if(this.id === ''){

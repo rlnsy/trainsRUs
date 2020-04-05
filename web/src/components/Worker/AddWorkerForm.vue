@@ -36,9 +36,9 @@
       <label for="input-5">Department</label>
       <b-form-select
         id="input-5"
-        v-model="form.type"
+        v-model="form.workerType"
         :options="departments"
-        :state="inputValidation.type"
+        :state="inputValidation.workerType"
       />
       <label for="input-6">Availabilty</label>
       <b-form-checkbox-group
@@ -80,6 +80,7 @@
 
 <script>
 import { Departments } from '../../utils/constants.js'
+import workerCalls from '../../utils/workerCalls.js'
 
 export default {
   name: 'AddWorkerForm',
@@ -90,7 +91,7 @@ export default {
           lastName: '',
           phoneNumber: '',
           role: '',
-          type: '',
+          workerType: '',
           checked: []
         },
         inputValidation: {
@@ -98,7 +99,7 @@ export default {
           lastName: null,
           phoneNumber: null,
           role: null,
-          type: null,
+          workerType: null,
           checked: null
         },
         departments: [{ text: 'Select One', value: null }].concat(Object.values(Departments)),
@@ -108,32 +109,41 @@ export default {
       }
   },
   methods: {
-      onSubmit() {
+      async onSubmit() {
         if(this.validateForm()){
             var reducer = (acc, curr) => acc !== "" ? acc + " " + curr : curr;
             const postForm = {
                 firstName: this.form.firstName,
                 lastName: this.form.lastName,
-                phoneNumber: this.form.phoneNumber,
+                phoneNumber: Number(this.form.phoneNumber),
                 role: this.form.role,
-                type: this.form.type,
-                availabilty: this.form.checked.reduce(reducer, "")
+                workerType: this.form.workerType,
+                availability: this.form.checked.reduce(reducer, "")
             }
 
-            // TODO: Send postForm to creation endpoint and verify success
-            console.log(JSON.stringify(postForm))
-
+            try {
+              const response = await workerCalls.createWorker(postForm)
+              if(response.workerId){ 
+                this.alertText = "Worker Created"
+                this.alertType = "success"
+                this.showDismissibleAlert = true;
+              } else {
+                this.alertText = "Creation Failed"
+                this.alertType = "danger"
+                this.showDismissibleAlert = true;
+              }
+            } catch (error) {
+              this.alertText = error
+              this.alertType = "danger"
+              this.showDismissibleAlert = true;
+            }
             
-            this.alertText = "Worker Created"
-            this.alertType = "success"
-            this.showDismissibleAlert = true;
-
             this.form = {
                 firstName: '',
                 lastName: '',
                 phoneNumber: '',
                 role: '',
-                type: '',
+                workerType: '',
                 checked: []
             }
         } else {
@@ -171,11 +181,11 @@ export default {
           } else {
               this.inputValidation.role = null;
           }
-          if (typeof this.form.type !== 'string' || !this.form.type instanceof String || this.form.type === ''){
-              this.inputValidation.type = false;
+          if (typeof this.form.workerType !== 'string' || !this.form.workerType instanceof String || this.form.workerType === ''){
+              this.inputValidation.workerType = false;
               valid = false;
           } else {
-              this.inputValidation.type = null;
+              this.inputValidation.workerType = null;
           }
           if (this.form.checked === []){
               this.inputValidation.checked = false;
