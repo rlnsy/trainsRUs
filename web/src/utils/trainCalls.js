@@ -2,45 +2,40 @@ import axios from 'axios'
 import { baseUrl } from './constants.js'
 
 async function getSummary(id) {
-    const all = await this.allShifts(id)
+    const response = await this.getShifts(id)
+    const all = response.data
     const total = all.length
-    const tripIDSet = Set()
-    all.forEach(shift => tripIDSet.add(shift.tripId))
+    const tripIDSet = new Set()
+    all.forEach(shift => { console.log(shift); tripIDSet.add(shift.tripId) })
     return {
         upcomingShifts: total,
-        distinctTrips: tripIDSet.size(),
+        distinctTrips: tripIDSet.size,
     }
 }
 
 async function getShifts(id) {
-    const url = baseUrl + '/shift'
     const request = {}
     request.workerId = Number(id)
     const requestData = JSON.stringify(request)
-    axios({
+    return await axios({
         method: 'GET',
-        url: url,
+        url: baseUrl + '/shift',
         params: {
             'body': requestData
         },
-    }).then((response) => {
-        return response
-    }, (error) => {
+    }).catch(error => {
         throw error
     })
 }
 
 async function getTicketInfo(formData) {
-    axios({
+    return await axios({
         method: 'get',
         url: baseUrl + "/ticket/info",
         params: {
             'body': JSON.stringify(formData)
         },
-    }).then((response) => {
-        response.valid = true;
-        return response
-    }, (error) => {
+    }).catch(error => {
         throw error
     })
 }
