@@ -57,6 +57,7 @@
 import { Conditions } from '../../utils/constants.js'
 import stationCalls from '../../utils/stationCalls.js'
 import trackCalls from '../../utils/trackCalls.js'
+import { goodStatusCode } from '../../utils/constants.js'
 
 export default {
   name: 'UpdateSegmentForm',
@@ -84,26 +85,35 @@ export default {
       }
   },
   async mounted(){
-    var allStations = await stationCalls.getAllStations()
-    this.stations = allStations.map(s => s.sname)
+    var response = await stationCalls.getAllStations()
+    this.stations = response.data.map(s => s.sname)
   },
   methods: {
       async onSubmit() {
         if(this.validateForm()){
-            // TODO: Send form to PUT endpoint and verify success
-            var postForm = {
-                segmentId: this.form.id
-            } 
-
+            var postForm = {}
             for(var key in this.form){
                 if(this.form[key] !== ''){
-                    postForm[key] = this.form[key]
+                    switch(key){
+                      case 'condition': 
+                        postForm.status = this.form.condition
+                        break;
+                      case 'length': 
+                        postForm.length = Number(this.form.length)
+                        break;
+                      case 'id':
+                        postForm.segmentId = Number(this.form.id)
+                        break;
+                      default:
+                        postForm[key] = this.form[key]
+                        break;
+                    }
                 }
             }
 
             try {
               const response = await trackCalls.updateSegment(postForm)
-              if(response.message === 'success'){ 
+              if(goodStatusCode(response.status)){ 
                 this.alertText = "Segment Updated"
                 this.alertType = "success"
                 this.showDismissibleAlert = true;

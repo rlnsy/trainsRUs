@@ -32,6 +32,7 @@
 
 <script>
 import workerCalls from '../../utils/workerCalls'
+import { goodStatusCode } from '../../utils/constants.js'
 
 export default {
   name: 'GetWorkerForm',
@@ -56,9 +57,15 @@ export default {
                 'workerId': Number(this.form.id)
               }
               const response = await workerCalls.getWorker(postForm)
-              this.workerInfo = response.data
-              this.form = {
-                id: '',
+              if(goodStatusCode(response.status)){
+                this.workerInfo = response.data
+                this.showDismissibleAlert = false;
+                this.form = {
+                  id: '',
+                }
+              } else {
+                this.alertText = response.data
+                this.showDismissibleAlert = true;
               }
             } catch (error) {
               this.alertText = error

@@ -27,6 +27,7 @@
 
 <script>
 import workerCalls from '../../utils/workerCalls.js'
+import { goodStatusCode } from '../../utils/constants.js'
 
 export default {
   name: 'DeleteWorkerForm',
@@ -54,12 +55,12 @@ export default {
               this.form = {
                 id: '',
               }
-              if(response.message === 'success'){ 
+              if(goodStatusCode(response.status)){ 
                 this.alertText = "Worker Deleted"
                 this.alertType = "success"
                 this.showDismissibleAlert = true;
               } else {
-                this.alertText = response.message
+                this.alertText = response.data.message
                 this.alertType = "danger"
                 this.showDismissibleAlert = true;
               }

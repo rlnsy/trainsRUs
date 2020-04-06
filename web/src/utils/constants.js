@@ -17,3 +17,8 @@ export const JSONheader = {
     'Cache-Control': 'no-cache',
     'Pragma': 'no-cache',
  }
+
+ export function goodStatusCode(status){
+    const reg = new RegExp('2.{2}')
+    return reg.test(status)
+ }

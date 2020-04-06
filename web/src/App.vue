@@ -59,7 +59,7 @@ h1, h2, h3, h4 {
   height: 100vh;
   width: 100vw;
   display: flex;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 .divider{
