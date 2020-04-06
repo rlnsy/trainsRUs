@@ -4,7 +4,7 @@
     <span class="divider" />
     <Workers v-if="scene === 0" />
     <Tracks v-if="scene === 1" />
-    <Train v-if="scene === 3" />
+    <Train v-if="scene === 2" />
   </div>
 </template>
 
