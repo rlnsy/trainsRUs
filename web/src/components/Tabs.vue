@@ -5,17 +5,23 @@
       id="0"
       @click="handleClick(0)"
     >
-      Workers
+      Welcome
     </button>
     <button
       id="1"
       @click="handleClick(1)"
     >
-      Tracks
+      Workers
     </button>
     <button
       id="2"
       @click="handleClick(2)"
+    >
+      Tracks
+    </button>
+    <button
+      id="3"
+      @click="handleClick(3)"
     >
       Train
     </button>
@@ -42,18 +48,17 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 130px;
   background-color: #414141;
-
   overflow: hidden;
 
   > button {
-      font-size: 110%;
-      font-family: 'Raleway', sans-serif;
+      font-size: 18px;
+      font-family: 'Roboto', sans-serif;  
       border: 0;
       padding: 0;
       display: flex;
-      width: 100px;
-      height: 100px;
+      height: 110px;
       justify-content: center;
       align-items: center;
       border-bottom: lightgray solid 1px;

@@ -76,7 +76,7 @@ export default {
               this.ticketInfo = res.data
               this.cardVariant = 'success'
             } catch (error) {
-              this.displayError(error)
+              this.displayError("Sorry, we couldn't find that ticket! Verify the information below and try again")
             }
         } else {
             this.alertText = "The following fields have issues: "

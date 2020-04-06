@@ -2,9 +2,10 @@
   <div id="app">
     <Tabs @clicked="handleSwitch" />
     <span class="divider" />
-    <Workers v-if="scene === 0" />
-    <Tracks v-if="scene === 1" />
-    <Train v-if="scene === 2" />
+    <welcome v-if="scene === 0" />
+    <Workers v-if="scene === 1" />
+    <Tracks v-if="scene === 2" />
+    <Train v-if="scene === 3" />
   </div>
 </template>
 
@@ -13,6 +14,7 @@ import Tabs from './components/Tabs.vue';
 import Workers from './components/Worker/Workers.vue';
 import Tracks from './components/Tracks/Tracks.vue';
 import Train from './components/Train/Train.vue';
+import Welcome from './components/Welcome.vue'
 
 export default {
   name: 'App',
@@ -21,6 +23,7 @@ export default {
     Workers,
     Tracks,
     Train,
+    Welcome,
   },
   data() {
     return {
@@ -51,12 +54,15 @@ body{
 }
 
 h1, h2, h3, h4 {
-    font-family: 'Raleway', sans-serif;
-    font-weight: bold !important;
-    margin: 0 !important;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600 !important;
+  margin: 0 !important;
 }
 
 #app {
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
   font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

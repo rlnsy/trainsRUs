@@ -73,9 +73,9 @@
           <p
             class="stat"
           >
-            {{ summaryStats.avergeTripLength }}
+            {{ summaryStats.avergeTripLength }} km
           </p>
-          <p>Average # of Segments Per Trip</p>
+          <p>Average Trip Length</p>
         </div>
       </div>
     </div>

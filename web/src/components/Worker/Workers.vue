@@ -85,6 +85,13 @@
       <button @click="loadTable()">
         Reload
       </button>
+      <a
+        href="#"
+        v-b-modal.modal-1
+        @click="currentFormHeader='Choose Columns'; formIndex = 3"
+        style="margin-left: 20px;"
+      >
+        Choose Table Columns</a>
     </div>
     <b-table
       :items="this.workers"
@@ -118,12 +125,6 @@
         @click="currentFormHeader='Get Worker'; formIndex = 2"
       >
         Get Worker</a>
-      <a
-        href="#"
-        v-b-modal.modal-1
-        @click="currentFormHeader='Choose Columns'; formIndex = 3"
-      >
-        Choose Table Columns</a>
     </div>
   </div>
 </template>
