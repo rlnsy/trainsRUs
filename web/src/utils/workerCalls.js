@@ -18,13 +18,20 @@ async function getSummary() {
     }
 }
 
-async function getAllWorkers() {
+async function getColumns(){
+    const response = await this.getAllWorkers()
+    return Object.keys(response.data[0])
+}
+
+async function getAllWorkers(columns) {
     const url = baseUrl + '/worker'
     return await axios({
         method: 'GET',
         url: url,
         params: {
-            'body': '{}'
+            'body': {
+                'fields': columns
+            }
         }
     }).catch(error => {
         throw error
@@ -66,4 +73,4 @@ async function deleteWorker(formData) {
     })
 }
 
-export default { getSummary, getAllWorkers, getWorker, createWorker, deleteWorker }
+export default { getSummary, getAllWorkers, getWorker, createWorker, deleteWorker, getColumns }

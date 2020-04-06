@@ -8,12 +8,13 @@
       <add-worker-form v-if="formIndex === 0" />
       <delete-worker-form v-if="formIndex === 1" />
       <get-worker-form v-if="formIndex === 2" />
+      <table-column-form v-if="formIndex === 3" @submit="handleFilter" :currentColumns="tableColumns"/>
     </b-modal>
     <h2>Manage All Workers</h2>
     <div class="l-row">
       <h4>Summary Stats</h4>
       <button @click="loadSummary()">
-        Load
+        Reload
       </button>
     </div>
     <div class="summary">
@@ -40,7 +41,7 @@
     >
       <h4>All Workers</h4>
       <button @click="loadTable()">
-        Load
+        Reload
       </button>
     </div>
     <b-table :items="this.workers" />
@@ -62,6 +63,12 @@
         @click="currentFormHeader='Get Worker'; formIndex = 2"
       >
         Get Worker</a>
+      <a
+        href="#"
+        v-b-modal.modal-1
+        @click="currentFormHeader='Choose Columns'; formIndex = 3"
+      >
+        Choose Table Columns</a>
     </div>
   </div>
 </template>
@@ -71,6 +78,7 @@ import workerCalls from '../../utils/workerCalls.js'
 import AddWorkerForm from './AddWorkerForm.vue'
 import DeleteWorkerForm from './DeleteWorkerForm.vue'
 import GetWorkerForm from './GetWorkerForm.vue'
+import TableColumnForm from './TableColumnForm.vue' 
 
 export default {
   name: 'Workers',
@@ -78,6 +86,7 @@ export default {
       AddWorkerForm,
       DeleteWorkerForm,
       GetWorkerForm,
+      TableColumnForm,
   },
   data() {
     return {
@@ -88,16 +97,27 @@ export default {
       workers: [],
       currentFormHeader: '',
       formIndex: 0,
+      tableColumns: [],
     }
+  },
+  async mounted() {
+    this.tableColumns = await workerCalls.getColumns()
+    this.loadSummary()
+    this.loadTable() 
   },
   methods: {
       async loadSummary() {
           this.summaryStats = await workerCalls.getSummary()
       },
       async loadTable() {
-          const response = await workerCalls.getAllWorkers()
+          const response = await workerCalls.getAllWorkers(this.tableColumns)
           this.workers = response.data
-      }
+      },
+      async handleFilter(evt) {
+          this.tableColumns = evt
+          await this.loadTable()
+          this.$bvModal.hide('modal-1')
+      },
   },
 };
 </script>
@@ -117,7 +137,7 @@ button{
     font-family: inherit;
     border: 0;
     padding: 0;
-    width: 55px;
+    width: 75px;
     height: 2em;
     margin-left: 15px;
     border-radius: 5px;
