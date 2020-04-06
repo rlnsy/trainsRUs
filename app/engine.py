@@ -217,6 +217,7 @@ class Engine:
   """
 
   W_ATTR = {
+    'workerId': 'id',
     'firstName': 'first_name',
     'lastName': 'last_name',
     'phoneNumber': 'phone_number',
@@ -279,7 +280,7 @@ class Engine:
             result[f] = trim(val)
           else:
             result[f] = val
-        if ('fields' in i) and (worker_type in i['fields']) or ('fields' not in i):
+        if ('fields' in i) and ('workerType' in i['fields']) or ('fields' not in i):
           result['workerType'] = worker_type
         return result
     else:
@@ -416,6 +417,7 @@ class Engine:
       else:
         match = search[0]
         return {
+        'segmentId': match[0],
         'trackLength': match[1],
         'condition': trim(match[2]),
         'startStation': trim(match[3]),

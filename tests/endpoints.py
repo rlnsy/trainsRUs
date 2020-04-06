@@ -185,6 +185,18 @@ class TestEndpoints(unittest.TestCase):
     res = get(resource("/worker"), data={'workerId': 27837})
     self.assertEqual(res.status_code, 404)
 
+  def test_worker_info_12(self):
+    new_id = post(
+      resource("/worker"), 
+      data = self.SAMPLE_WORKER, 
+      decode_response=True)['data']['workerId']
+    res = get(resource("/worker"), 
+      data={
+        'workerId': new_id,
+      }, decode_response=True)
+    self.assertEqual(res['response'].status_code, 200)
+    self.assertEqual(res['data']['workerId'], new_id)
+
   def test_worker_info_5(self):
     new_id = post(
       resource("/worker"), 
@@ -192,7 +204,8 @@ class TestEndpoints(unittest.TestCase):
       decode_response=True)['data']['workerId']
     res = get(resource("/worker"), 
       data={
-        'workerId': new_id
+        'workerId': new_id,
+        'fields': ['lastName', 'firstName', 'phoneNumber', 'role', 'availability', 'workerType']
       }, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'], self.SAMPLE_WORKER)
@@ -299,6 +312,7 @@ class TestEndpoints(unittest.TestCase):
     slightly_different_worker = copy.deepcopy(self.SAMPLE_WORKER)
     slightly_different_worker['firstName'] = new_name
     slightly_different_worker['phoneNumber'] = new_phone
+    slightly_different_worker['workerId'] = new_id
     res = put(resource("/worker"), 
       data={
         'workerId': new_id,
@@ -447,7 +461,9 @@ class TestEndpoints(unittest.TestCase):
       data={
         'segmentId': sid
       }, decode_response=True)
-    self.assertEqual(res['data'], self.SAMPLE_SEGMENT)
+    self.assertEqual(res['data']['segmentId'], sid)
+    for k in self.SAMPLE_SEGMENT:
+      self.assertEqual(res['data'][k], self.SAMPLE_SEGMENT[k])
 
   def test_segment_info_4(self):
     res = get(resource("/segment"), 
@@ -485,6 +501,7 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'],
       {
+        'segmentId': 1,
         'condition': "Broken",
         'endStation': "West",
         'startStation': "East",
@@ -510,6 +527,7 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'],
       {
+        'segmentId': 1,
         'condition': "Broken",
         'endStation': "West",
         'startStation': "East",
@@ -536,6 +554,7 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'],
       {
+        'segmentId': 1,
         'condition': "Broken",
         'endStation': "North",
         'startStation': "West",
