@@ -127,7 +127,7 @@ export default {
           try {
             workerRes = await workerCalls.getWorker({'workerId': Number(this.id)})
           } catch (error) {
-            this.displayError(error)
+            this.displayError('No worker with that id exists in the database')
           }
 
           if(goodStatusCode(workerRes.status)){
