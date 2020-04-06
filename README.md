@@ -12,7 +12,7 @@ chmod +x run.sh
 ```
 ./run.sh stack-up
 ```
-  this will set up the postgres+python+flask stack, and load in initial tables and entries.
+  this will set up the postgres+python+flask+frontend stack, and load in initial tables and entries.
 
 4. Tear down when done unless you want to murder your battery
 ```
