@@ -5,11 +5,13 @@ async function getSummary() {
     const goodCount = await getStats(Conditions.GOOD)
     const repairCount = await getStats(Conditions.REPAIRS)
     const criticalCount = await getStats(Conditions.CRITICAL)
+    const avgTrip = await averageTripLength()
 
     return {
         totalTracks: goodCount.data.numSegments + repairCount.data.numSegments + criticalCount.data.numSegments,
         needRepairs: repairCount.data.numSegments,
         criticalCondition: criticalCount.data.numSegments,
+        avergeTripLength: avgTrip.data.avgTripLength,
     }
 }
 
@@ -54,7 +56,6 @@ async function getAllTracks(cond) {
 }
 
 async function updateSegment(formData){
-    console.log(formData)
     return await axios({
         method: 'PUT',
         url: baseUrl + '/segment/status',
@@ -65,4 +66,16 @@ async function updateSegment(formData){
     })
 }
 
-export default { getSummary, getAllTracks, updateSegment }
+async function averageTripLength(formData){
+    return await axios({
+        method: 'GET',
+        url: baseUrl + '/stat/trip/length',
+        params: {
+            body: {}
+        }
+    }).catch(error => {
+        throw error
+    })
+}
+
+export default { getSummary, getAllTracks, updateSegment, averageTripLength }

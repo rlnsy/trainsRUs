@@ -6,7 +6,7 @@ async function getSummary(id) {
     const all = response.data
     const total = all.length
     const tripIDSet = new Set()
-    all.forEach(shift => { console.log(shift); tripIDSet.add(shift.tripId) })
+    all.forEach(shift => tripIDSet.add(shift.tripId))
     return {
         upcomingShifts: total,
         distinctTrips: tripIDSet.size,

@@ -73,4 +73,16 @@ async function deleteWorker(formData) {
     })
 }
 
-export default { getSummary, getAllWorkers, getWorker, createWorker, deleteWorker, getColumns }
+async function getOverworked(){ 
+    return await axios({
+        method: 'GET',
+        url: baseUrl + '/worker/overworked',
+        params: {
+            'body': {}
+        },
+    }).catch(error => {
+        throw error
+    })
+}
+
+export default { getSummary, getAllWorkers, getWorker, createWorker, deleteWorker, getColumns, getOverworked }
