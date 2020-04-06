@@ -176,12 +176,12 @@ class Engine:
       v['lastName'], 
       v['phoneNumber'], 
       v['role'], 
-      v['availability'])))
+      v['availability']))) # Q.1
     self._dbw.execute((
       """
       INSERT INTO %s (worker_id) VALUES (%d);
       """
-      % (self.WORKER_TABLES[v['workerType']], wid)))
+      % (self.WORKER_TABLES[v['workerType']], wid))) # Q.2
     return {
     'workerId': wid
     }
@@ -206,7 +206,7 @@ class Engine:
       """
       DELETE FROM Worker
       WHERE id=%d
-      """ % v['workerId'])
+      """ % v['workerId']) # Q.3
     return {
       'message': 'success'
     }
@@ -261,7 +261,7 @@ class Engine:
       WHERE
         Worker.id = %d;
         """
-        % (attr_selection, table, table, v['workerId']))
+        % (attr_selection, table, table, v['workerId'])) # Q.8
         if len(search) != 0:
           match = search[0]
           worker_type = t
@@ -365,7 +365,7 @@ class Engine:
         ON Works_On.segment_id = Segment.id
       WHERE
         Works_On.maintenance_worker_id = %d;
-      """ % wid)
+      """ % wid) # Q.9
     for t in self._dbw.execute(query):
       data.append({
         'segmentId': t[0],
@@ -411,7 +411,7 @@ class Engine:
       search = self._dbw.execute(
         """
       SELECT * FROM Segment WHERE id = %d;
-        """ % i['segmentId']) 
+        """ % i['segmentId']) # Q.6
       if len(search) == 0:
         raise NotFound("Segment %d does not exist" % i['segmentId'])
       else:
@@ -456,7 +456,7 @@ class Engine:
           Segment
       WHERE
           condition = '%s';
-      """ % v['status']
+      """ % v['status'] # Q.10
     result = self._dbw.execute(query)
     return {
       'status': v['status'],
@@ -494,6 +494,7 @@ class Engine:
       updates += 1
     if updates == 0:
       raise MissingInput("No fields to update")
+    # Q.5
     self._dbw.execute(
       """
       UPDATE Segment 
@@ -525,7 +526,7 @@ class Engine:
             FROM Works_On WO
             WHERE W.worker_id = WO.maintenance_worker_id AND 
               S.id = WO.segment_id));
-            """
+            """ # Q.12
     results = self._dbw.execute(query)
     wids = []
     for r in results:
@@ -542,6 +543,7 @@ class Engine:
     v = self.extract_fields(['workerId'], i)
     wid = v['workerId']
     results = []
+    # Q.4
     for r in self._dbw.execute(
       """
       SELECT * from Works_Shift
@@ -701,7 +703,7 @@ class Engine:
         seat_number = %d
         AND
         trip_id = %d
-      """ % (v['seatNumber'], v['tripId']))
+      """ % (v['seatNumber'], v['tripId'])) # Q.7
     if len(search) == 0:
       raise NotFound("Requested ticket does not exist")
     else:
@@ -793,7 +795,7 @@ class Engine:
             ON
             Trip_Leg.segment_id = Segment.id
           GROUP BY trip_id) AS LENGTH
-            """
+            """ # Q.11
     result = self._dbw.execute(query)
     return {
       'avgTripLength': float(result[0][0])
