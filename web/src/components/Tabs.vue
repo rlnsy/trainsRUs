@@ -58,15 +58,19 @@ export default {
       align-items: center;
       border-bottom: lightgray solid 1px;
       background-color: white;
+      color: black;
   }
 
   > .active {
       color: white;
       background-color: var(--trainBlue);
+      border-bottom: var(--trainBlue) solid 1px;
   }
 
   > button:hover{
       background-color: var(--trainBlue);
+      color: white;
+      border-bottom: var(--trainBlue) solid 1px;
   }
 }
 </style>

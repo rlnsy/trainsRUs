@@ -36,6 +36,10 @@ export default {
 </script>
 
 <style lang="scss">
+$primary: #828EFF;
+@import 'node_modules/bootstrap/scss/bootstrap';
+@import 'node_modules/bootstrap-vue/src/index.scss';
+
 :root{
   --trainBlue: #828EFF;
   --trainAccentBlue: #4472CA;

@@ -100,7 +100,7 @@ export default {
   computed: {
       statsIsEmpty() {
         return Object.keys(this.summaryStats).length === 0;
-      }
+      },
   },
   methods: {
       async loadSummary() {
@@ -131,10 +131,10 @@ export default {
           }
 
           if(goodStatusCode(workerRes.status)){
-            console.log(workerRes.data)
             if(workerRes.data.workerType === Departments.TRAIN){
               this.loadTable()
               this.loadSummary()
+              this.showDismissibleAlert = false;
             } else {
               this.displayError('Worker is not in Train Department')
             }
@@ -180,6 +180,7 @@ form{
 
 button {
     margin-left: 15px;
+    min-height: 35px;
 }
 
 .summary{
@@ -225,5 +226,9 @@ button {
     align-items: flex-end;
     right: 70px;
     top: 30px;
+}
+
+button{
+  color: white;
 }
 </style>

@@ -16,8 +16,7 @@
         id="input-1"
         switches
         stacked
-      >
-      </b-form-checkbox-group>
+      />
       <b-button
         @click="onSubmit"
         variant="primary"
@@ -34,7 +33,12 @@ import workerCalls from '../../utils/workerCalls';
 export default {
   name: 'TableColumnForm',
   props: {
-      currentColumns: Array,
+      currentColumns: {
+          type: Array,
+          default: () => {
+              return []
+          }
+      },
   },
   data() {
       return {
