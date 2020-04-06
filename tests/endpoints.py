@@ -334,11 +334,17 @@ class TestEndpoints(unittest.TestCase):
     results = res['data']
     self.assertIn({
         'segmentId': 1,
-        'status': "Working"
+        'trackLength': 100,
+        'condition': "Working",
+        'startStation': "East",
+        'endStation': "West"
       }, results)
     self.assertIn({
         'segmentId': 3,
-        'status': "Broken"
+        'trackLength': 150,
+        'condition': "Broken",
+        'startStation': "Central",
+        'endStation': "West"
       }, results)
 
   def test_segment_status_2(self):
@@ -351,7 +357,10 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(results[0],
       {
         'segmentId': 2,
-        'status': None
+        'trackLength': 200,
+        'condition': None,
+        'startStation': "East",
+        'endStation': "Central"
       })
 
 

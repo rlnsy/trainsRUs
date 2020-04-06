@@ -353,12 +353,12 @@ class Engine:
     query = None
     if wid is None:
       query = """
-      SELECT id, condition FROM Segment;
+      SELECT * FROM Segment;
       """
     else:
       query = ("""
       SELECT
-        id, condition
+        *
       FROM
         Segment INNER JOIN Works_On
         ON Works_On.segment_id = Segment.id
@@ -368,7 +368,10 @@ class Engine:
     for t in self._dbw.execute(query):
       data.append({
         'segmentId': t[0],
-        'status': trim(t[1])
+        'trackLength': t[1],
+        'condition': trim(t[2]),
+        'startStation': trim(t[3]),
+        'endStation': trim(t[4])
       })
     return data
 
