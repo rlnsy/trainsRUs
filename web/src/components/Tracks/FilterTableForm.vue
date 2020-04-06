@@ -38,7 +38,7 @@ export default {
         inputValidation: {
           condition: null,
         },
-        conditions: Object.values(Conditions),
+        conditions: [{ value: 'Any', text: 'Any Condition' }].concat(Object.values(Conditions)),
         showDismissibleAlert: false,
         alertText: '',
         alertType: ''
@@ -47,10 +47,12 @@ export default {
   methods: {
       onSubmit() {
         if(this.validateForm()){
-            this.$emit('submit', this.form.condition)
-            this.form = {
+            if(this.form.condition === 'Any'){
+              this.form = {
                 condition: '',
+              }
             }
+            this.$emit('submit', this.form.condition)
         } else {
             this.alertText = "The following fields have issues: "
             this.alertType = "danger"
