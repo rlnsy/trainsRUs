@@ -615,27 +615,27 @@ VALUES
 INSERT INTO
   Segment
 VALUES
-  (1, 100, 'Working', 'East', 'West');
+  (1, 100, 'Normal', 'East', 'West');
 
 INSERT INTO
   Segment
 VALUES
-  (2, 200, NULL, 'East', 'Central');
+  (2, 200, 'Normal', 'East', 'Central');
 
 INSERT INTO
   Segment
 VALUES
-  (3, 150, 'Broken', 'Central', 'West');
+  (3, 150, 'Needs Repairs', 'Central', 'West');
 
 INSERT INTO
   Segment
 VALUES
-  (4, 80, NULL, 'West', 'North');
+  (4, 80, 'Normal', 'West', 'North');
 
 INSERT INTO
   Segment
 VALUES
-  (5, 300, NULL, 'South', 'North');
+  (5, 300, 'Critical', 'South', 'North');
 
 INSERT INTO
   UID

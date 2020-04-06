@@ -17,12 +17,6 @@
       id="2"
       @click="handleClick(2)"
     >
-      Sales
-    </button>
-    <button
-      id="3"
-      @click="handleClick(3)"
-    >
       Train
     </button>
   </div>

@@ -78,6 +78,8 @@
 <script>
 import trainCalls from '../../utils/trainCalls.js'
 import CheckTicketForm from './CheckTicketsForm.vue'
+import workerCalls from '../../utils/workerCalls';
+import { goodStatusCode, Departments } from '../../utils/constants';
 
 export default {
   name: 'Train',
@@ -110,7 +112,8 @@ export default {
       },
       async loadTable() {
         try {
-          this.shifts =  await trainCalls.getShifts(this.id)
+          const response = await trainCalls.getShifts(this.id)
+          this.shifts = response.data
         } catch(error) {
           this.displayError(error)
         }
@@ -120,14 +123,35 @@ export default {
               this.displayError("Please enter a value for ID")
               return;
           }
+          var workerRes
+          try {
+            workerRes = await workerCalls.getWorker({'workerId': Number(this.id)})
+          } catch (error) {
+            this.displayError(error)
+          }
 
-          this.loadSummary()
-          this.loadTable()
-          // TODO: Try Catch for error, change msg and activate error banner with showDismissibleAlert = true
+          if(goodStatusCode(workerRes.status)){
+            console.log(workerRes.data)
+            if(workerRes.data.workerType === Departments.TRAIN){
+              this.loadTable()
+              this.loadSummary()
+            } else {
+              this.displayError('Worker is not in Train Department')
+            }
+          } else {
+            this.displayError(workerRes.data.message)
+          }
+          
       },
       displayError(msg){
           this.alertText = msg
           this.showDismissibleAlert = true
+          this.resetPage()
+      },
+      resetPage(){
+        this.shifts = []
+        this.id = ''
+        this.summaryStats = {}
       }
   },
 };
@@ -139,6 +163,8 @@ export default {
     width: 100%;
     height: 100%;
     padding: 30px 50px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 label{

@@ -2,19 +2,19 @@ import axios from 'axios'
 import { baseUrl, JSONheader, Conditions} from './constants.js'
 
 async function getSummary() {
-    const goodCount = await getStats(Conditions.GOOD).numSegments
-    const repairCount = await getStats(Conditions.REPAIRS).numSegments
-    const criticalCount = await getStats(Conditions.CRITICAL).numSegments
+    const goodCount = await getStats(Conditions.GOOD)
+    const repairCount = await getStats(Conditions.REPAIRS)
+    const criticalCount = await getStats(Conditions.CRITICAL)
 
     return {
-        totalTracks: goodCount + repairCount + criticalCount,
-        needRepairs: repairCount,
-        criticalCondition: criticalCount,
+        totalTracks: goodCount.data.numSegments + repairCount.data.numSegments + criticalCount.data.numSegments,
+        needRepairs: repairCount.data.numSegments,
+        criticalCondition: criticalCount.data.numSegments,
     }
 }
 
 async function getStats(status){
-    axios({
+    return await axios({
         method: 'GET',
         url: baseUrl + '/segment/status/count',
         params: {
@@ -22,16 +22,14 @@ async function getStats(status){
                 'status': status
             })
         },
-    }).then((response) => {
-        return response
-    }, (error) => {
+    }).catch(error => {
         throw error
     })
 }
 
 async function getAllTracks(cond) {
     if(cond){ 
-        axios({
+        return await axios({
             method: 'GET',
             url: baseUrl + '/segment',
             params: {
@@ -39,35 +37,30 @@ async function getAllTracks(cond) {
                     'condition': cond
                 })
             },
-        }).then((response) => {
-            return response
-        }, (error) => {
+        }).catch(error => {
             throw error
         })
     } else {
-        axios({
+        return await axios({
             method: 'GET',
             url: baseUrl + '/segment/status',
             params: {
                 'body': '{}'
             }
-        }).then((response) => {
-            return response
-        }, (error) => {
+        }).catch(error => {
             throw error
         })
     }
 }
 
 async function updateSegment(formData){
-    axios({
+    console.log(formData)
+    return await axios({
         method: 'PUT',
         url: baseUrl + '/segment/status',
         headers: JSONheader,
         data: JSON.stringify(formData)
-    }).then((response) => {
-        return response
-    }, (error) => {
+    }).catch(error => {
         throw error
     })
 }

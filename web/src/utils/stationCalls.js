@@ -1,23 +1,14 @@
 import axios from 'axios'
+import { baseUrl } from './constants'
 
-async function getAllStations(cond) {
-    return [
-        {
-            sname: 'SF Station',
-            location: 'Mountain View',
-            capacity: '111',
-        },
-        {
-            sname: 'East Station',
-            location: 'East Capital',
-            capacity: '3131',
-        },
-        {
-            sname: 'Central Station',
-            location: 'Central City',
-            capacity: '100',
-        },
-    ]
+async function getAllStations() {
+    return await axios({
+        method: 'get',
+        url: baseUrl + '/station',
+        params: {
+            body: {}
+        }
+    }).catch(error => {throw error})
 }
 
 export default { getAllStations }

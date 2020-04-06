@@ -95,7 +95,8 @@ export default {
           this.summaryStats = await workerCalls.getSummary()
       },
       async loadTable() {
-          this.workers = await workerCalls.getAllWorkers()
+          const response = await workerCalls.getAllWorkers()
+          this.workers = response.data
       }
   },
 };
@@ -107,6 +108,8 @@ export default {
     width: 100%;
     height: 100%;
     padding: 30px 50px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 button{

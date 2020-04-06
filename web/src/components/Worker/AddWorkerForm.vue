@@ -20,12 +20,11 @@
         v-model="form.lastName"
         :state="inputValidation.lastName"
       />
-      <label for="input-3">Phone Number (No Formatting)</label>
+      <label for="input-3">Phone Number</label>
       <b-form-input
         id="input-3"
         v-model="form.phoneNumber"
         :state="inputValidation.phoneNumber"
-        type="number"
       />
       <label for="input-4">Job Title</label>
       <b-form-input
@@ -79,7 +78,7 @@
 </template>
 
 <script>
-import { Departments } from '../../utils/constants.js'
+import { Departments, goodStatusCode } from '../../utils/constants.js'
 import workerCalls from '../../utils/workerCalls.js'
 
 export default {
@@ -102,7 +101,7 @@ export default {
           workerType: null,
           checked: null
         },
-        departments: [{ text: 'Select One', value: null }].concat(Object.values(Departments)),
+        departments: Object.values(Departments),
         showDismissibleAlert: false,
         alertText: '',
         alertType: ''
@@ -115,7 +114,7 @@ export default {
             const postForm = {
                 firstName: this.form.firstName,
                 lastName: this.form.lastName,
-                phoneNumber: Number(this.form.phoneNumber),
+                phoneNumber: this.form.phoneNumber,
                 role: this.form.role,
                 workerType: this.form.workerType,
                 availability: this.form.checked.reduce(reducer, "")
@@ -123,7 +122,7 @@ export default {
 
             try {
               const response = await workerCalls.createWorker(postForm)
-              if(response.workerId){ 
+              if(goodStatusCode(response.status)){ 
                 this.alertText = "Worker Created"
                 this.alertType = "success"
                 this.showDismissibleAlert = true;
@@ -169,7 +168,7 @@ export default {
           } else {
               this.inputValidation.lastName = null;
           }
-          if (this.form.phoneNumber === ''){
+          if (typeof this.form.phoneNumber !== 'string' || !this.form.phoneNumber instanceof String || this.form.phoneNumber === ''){
               this.inputValidation.phoneNumber = false;
               valid = false;
           } else {

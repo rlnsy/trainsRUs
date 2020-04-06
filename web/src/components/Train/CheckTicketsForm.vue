@@ -44,6 +44,7 @@
 
 <script>
 import trainCalls from '../../utils/trainCalls.js'
+import { goodStatusCode } from '../../utils/constants.js'
 
 export default {
   name: 'CheckTicketForm',
@@ -71,12 +72,11 @@ export default {
               'seatNumber': Number(this.form.seatNumber)
             }
             try {
-              this.ticketInfo = await trainCalls.getTicketInfo(postForm)
+              const res = await trainCalls.getTicketInfo(postForm)
+              this.ticketInfo = res.data
               this.cardVariant = 'success'
             } catch (error) {
-              this.cardVariant = 'danger'
-              this.alertText = error
-              this.showDismissibleAlert = true;
+              this.displayError(error)
             }
         } else {
             this.alertText = "The following fields have issues: "
@@ -101,6 +101,22 @@ export default {
               this.inputValidation.tripID = null;
           }
           return valid
+      },
+      displayError(msg){
+        this.alertText = msg
+        this.showDismissibleAlert = true;
+        this.resetPage()
+      },
+      resetPage(){
+        this.form = {
+          seatNumber: '',
+          tripID: '',
+        }
+        this.inputValidation = {
+          seatNumber: null,
+          tripID: null,
+        }
+        this.ticketInfo = {}
       }
   },
 };

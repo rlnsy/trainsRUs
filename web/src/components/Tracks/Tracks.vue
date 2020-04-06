@@ -117,7 +117,8 @@ export default {
       },
       async loadTable() {
         try {
-          this.tracks = await trackCalls.getAllTracks(this.tableCondition)
+          const response = await trackCalls.getAllTracks(this.tableCondition)
+          this.tracks = response.data
         } catch (error) {
           this.alertText = error
           this.showDismissibleAlert = true
@@ -138,6 +139,8 @@ export default {
     width: 100%;
     height: 100%;
     padding: 30px 50px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 button{
