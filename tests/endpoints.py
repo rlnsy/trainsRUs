@@ -347,16 +347,16 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res['response'].status_code, 200)
     results = res['data']
     self.assertIn({
-        'segmentId': 1,
-        'trackLength': 100,
-        'condition': "Working",
-        'startStation': "East",
-        'endStation': "West"
+        'segmentId': 4,
+        'trackLength': 80,
+        'condition': "Normal",
+        'startStation': "West",
+        'endStation': "North"
       }, results)
     self.assertIn({
         'segmentId': 3,
         'trackLength': 150,
-        'condition': "Broken",
+        'condition': "Needs Repairs",
         'startStation': "Central",
         'endStation': "West"
       }, results)
@@ -372,7 +372,7 @@ class TestEndpoints(unittest.TestCase):
       {
         'segmentId': 2,
         'trackLength': 200,
-        'condition': None,
+        'condition': "Normal",
         'startStation': "East",
         'endStation': "Central"
       })
@@ -399,7 +399,7 @@ class TestEndpoints(unittest.TestCase):
     self.assertEqual(res['data']['numSegments'], 0)
 
   def test_segment_status_count_3(self):
-    target_status = None
+    target_status = "Normal"
     res = get(resource("/segment/status/count"),
       data={
         'status': target_status
@@ -519,18 +519,18 @@ class TestEndpoints(unittest.TestCase):
   def test_update_status_5(self):
     res = put(resource("/segment/status"),
       data={
-        'segmentId': 1,
+        'segmentId': 6,
         'length': 3000
       })
     self.assertEqual(res.status_code, 201)
-    res = get(resource("/segment"), data={'segmentId': 1}, decode_response=True)
+    res = get(resource("/segment"), data={'segmentId': 6}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'],
       {
-        'segmentId': 1,
-        'condition': "Broken",
-        'endStation': "West",
-        'startStation': "East",
+        'segmentId': 6,
+        'condition': "Looking Good",
+        'endStation': "North",
+        'startStation': "West",
         'trackLength': 3000
       })
 
@@ -545,20 +545,20 @@ class TestEndpoints(unittest.TestCase):
   def test_update_status_6(self):
     res = put(resource("/segment/status"),
       data={
-        'segmentId': 1,
+        'segmentId': 5,
         'endStation': "North",
         'startStation': "West"
       })
     self.assertEqual(res.status_code, 201)
-    res = get(resource("/segment"), data={'segmentId': 1}, decode_response=True)
+    res = get(resource("/segment"), data={'segmentId': 5}, decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
     self.assertEqual(res['data'],
       {
-        'segmentId': 1,
-        'condition': "Broken",
+        'segmentId': 5,
+        'condition': "Critical",
         'endStation': "North",
         'startStation': "West",
-        'trackLength': 3000
+        'trackLength': 300
       })
 
   def test_update_status_7(self):
