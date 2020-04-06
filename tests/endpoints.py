@@ -810,7 +810,7 @@ class TestEndpoints(unittest.TestCase):
   def test_get_avg_length_2(self):
     res = get(resource("/stat/trip/length"), decode_response=True)
     self.assertEqual(res['response'].status_code, 200)
-    self.assertEqual(res['data']['avgTripLength'], 1.0)
+    self.assertEqual(res['data']['avgTripLength'], 166.0)
 
 
   """

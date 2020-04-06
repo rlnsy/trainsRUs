@@ -783,16 +783,16 @@ class Engine:
 
   def get_avg_trip_length(self):
     query = """
-      SELECT AVG (Count.num_trip_segments) 
+      SELECT AVG (LENGTH.sum_trip_segments) 
       FROM 
-        (SELECT COUNT(*) AS num_trip_segments
+        (SELECT SUM(track_length) AS sum_trip_segments
           FROM 
             Trip_Leg 
             INNER JOIN 
             Segment
             ON
-            Trip_Leg.segment_id = Segment.id 
-          GROUP BY trip_id) AS Count
+            Trip_Leg.segment_id = Segment.id
+          GROUP BY trip_id) AS LENGTH
             """
     result = self._dbw.execute(query)
     return {
