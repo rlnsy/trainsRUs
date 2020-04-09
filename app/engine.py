@@ -427,7 +427,7 @@ class Engine:
       search = self._dbw.execute(
         """
       SELECT * FROM Segment WHERE condition = '%s';
-        """ % i['condition'])
+        """ % i['condition']) # Q.7
       results = []
       for s in search:
         sid = s[0]
@@ -698,24 +698,40 @@ class Engine:
     ], i)
     search = self._dbw.execute(
       """
-      SELECT * FROM Ticket
+      SELECT * FROM (Ticket
+      INNER JOIN
+      Passenger
+      On
+      Passenger.id = Ticket.passenger_id)
+      INNER JOIN
+      Class
+      on
+      Class.type = Ticket.class_type
       WHERE 
-        seat_number = %d
+        Ticket.seat_number = %d
         AND
-        trip_id = %d
-      """ % (v['seatNumber'], v['tripId'])) # Q.7
+        Ticket.trip_id = %d
+      """ % (v['seatNumber'], v['tripId'])) # Q.9
     if len(search) == 0:
       raise NotFound("Requested ticket does not exist")
     else:
       match = search[0]
-      pid = match[1]
-      ctype = match[2]
-      passenger = self.get_passenger_info({'passengerId': pid})
-      ticketclass = self.get_class_info({'classType': ctype})
+      # passenger = self.get_passenger_info({'passengerId': pid})
+      # ticketclass = self.get_class_info({'classType': ctype})
       return {
         'seatNumber': match[0],
-        'passenger': passenger,
-        'class': ticketclass
+        'passenger': {
+            'passengerId': match[4],
+            'name': ("%s %s" % (trim(match[5]), trim(match[6]))),
+            'phoneNumber': trim(match[7]),
+            'email': trim(match[8])
+          },
+        'class': {
+          'classType': trim(match[2]),
+          'refundable': match[11],
+          'priorityBoarding': match[12],
+          'freeFood': match[13]
+        }
       }
 
 
@@ -801,6 +817,7 @@ class Engine:
       return {
         'avgTripLength': 0.0
       }
-    return {
-      'avgTripLength': float(result[0][0])
-    }
+    else:
+      return {
+        'avgTripLength': float(result[0][0])
+      }

@@ -36,7 +36,7 @@ Set up application context
 """
 app = Flask("Trains 'R' Us")
 CORS(app)
-logger = ApplicationLogger(demo_mode=True)
+logger = ApplicationLogger(debug_on=True)
 engine = Engine(logger)
 
 

@@ -558,9 +558,21 @@ VALUES
   );
 
 INSERT INTO
+  Worker
+VALUES
+  (
+    18,
+    'Rowan',
+    'Lindsay',
+    Null,
+    'Chef',
+    'M T W Th'
+  );
+
+INSERT INTO
   UID
 VALUES
-  ('worker', 16);
+  ('worker', 18);
 
 INSERT INTO
   Maintenance_Worker
@@ -718,6 +730,11 @@ VALUES
   (16);
 
 INSERT INTO
+  Train_Worker
+VALUES
+  (18);
+
+INSERT INTO
   Works_Shift
 VALUES
   (4, 1, 1, 8, '8:00');
@@ -746,6 +763,11 @@ INSERT INTO
   Works_Shift
 VALUES
   (13, 5, 5, 8, '14:00');
+
+INSERT INTO
+  Works_Shift
+VALUES
+  (18, 5, 5, 3, '9:00');
 
 INSERT INTO
   Station_Worker
