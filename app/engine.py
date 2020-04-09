@@ -797,7 +797,10 @@ class Engine:
           GROUP BY trip_id) AS LENGTH
             """ # Q.11
     result = self._dbw.execute(query)
+    if result[0][0] is None:
+      return {
+        'avgTripLength': 0.0
+      }
     return {
       'avgTripLength': float(result[0][0])
     }
-
