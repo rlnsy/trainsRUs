@@ -15,7 +15,6 @@ services:
   frontend:
     build: ../web
     ports:
-      - "8080:8080"
+      - "80:80"
     depends_on:
       - "application"
-    command: ["yarn", "serve"]
