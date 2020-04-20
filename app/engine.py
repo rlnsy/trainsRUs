@@ -1,8 +1,6 @@
 from db import PSQLWrapper
-from utils import ApplicationLogger, trim_char_seq as trim
+from utils import ApplicationLogger, trim_char_seq as trim, loadAuthToken
 
-
-EXECUTE_TOKEN = "61YYZlA!QkeZ3V7NtY9OPDvN$u7N^E&t"
 
 """
 Define errors used for communication to outer layer
@@ -53,6 +51,8 @@ class Engine:
     self._dbw = PSQLWrapper(app_logger)
     self._logger.info("Establishing a test connection to database")
     self._dbw.connect()
+    self.EXECUTE_TOKEN = loadAuthToken()
+    self._logger.info("Loaded authorization token: %s" % self.EXECUTE_TOKEN)
 
 
   """
@@ -125,7 +125,7 @@ class Engine:
 
   def handle_execute(self, i):
     v = self.extract_fields(['sql', 'ex_token'], i)
-    if v['ex_token'] != EXECUTE_TOKEN:
+    if v['ex_token'] != self.EXECUTE_TOKEN:
       raise NotAllowed("Invalid execute token")
     try:
       result = self._dbw.execute(

@@ -36,3 +36,13 @@ def trim_char_seq(s):
     elif type(s) is not str:
       raise Exception("Invalid type for char strip: %s" % str(type(s)))
     return s.rstrip(' ')
+
+
+def loadAuthToken():
+    token = None
+    try:
+        with open("auth.token", "r") as token_file:
+            token = token_file.read()
+    except Exception:
+        raise Exception("Could not load authorization token")
+    return token
